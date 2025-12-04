@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About: Data-Driven Risk & Vulnerability Management</title>
+    <!-- Load Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load React and Babel for JSX in the browser -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <style>
+        /* Define Inter font and global styling */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f8f8;
+        }
+        /* Custom scrollbar style for the whole app */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #e0e0e0; }
+        ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #2563eb; }
+    </style>
+</head>
+<body>
+
+    <div id="root">
+        <!-- React application will be rendered here -->
+    </div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Custom SVG Icons (Replacing lucide-react)
+        const Shield = (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>;
+        const Zap = (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>;
+        const Database = (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M21 19c0 1.66-4 3-9 3s-9-1.34-9-3"/></svg>;
+        const Target = (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>;
+        const TrendingUp = (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>;
+
+
+        // --- COMPONENTS ---
+
+        const FeatureCard = ({ icon: Icon, title, description, color }) => (
+            <div className={`bg-white p-6 rounded-xl shadow-lg border-t-4 ${color}`}>
+                <Icon className={`w-8 h-8 ${color.replace('border-t-4', 'text')}`} />
+                <h3 className="mt-4 text-xl font-bold text-gray-900">{title}</h3>
+                <p className="mt-2 text-gray-600">{description}</p>
+            </div>
+        );
+
+        const PCSPComponent = ({ letter, title, description, bgColor, textColor }) => (
+            <div className={`p-6 rounded-lg shadow-md ${bgColor} transform transition duration-300 hover:scale-[1.02] cursor-default`}>
+                <div className="flex items-start space-x-4">
+                    <span className={`text-4xl font-extrabold ${textColor}`}>{letter}</span>
+                    <div>
+                        <h4 className={`text-xl font-bold ${textColor}`}>{title}</h4>
+                        <p className={`mt-1 text-sm ${textColor.replace('text-white', 'text-gray-100').replace('text-blue-800', 'text-gray-700')}`}>{description}</p>
+                    </div>
+                </div>
+            </div>
+        );
+
+        const AboutApp = () => {
+            return (
+                <div className="min-h-screen">
+                    {/* Header */}
+                    <header className="bg-white shadow-lg">
+                        <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+                            <h1 className="text-5xl font-extrabold tracking-tight text-gray-900 flex items-center">
+                                <Shield className="w-10 h-10 mr-4 text-blue-600" />
+                                Data-Driven Risk & Vulnerability Evaluation
+                            </h1>
+                            <p className="mt-3 text-xl text-gray-600">
+                                Empowering resilience through intelligent, continuous assessment.
+                            </p>
+                        </div>
+                    </header>
+
+                    {/* Main Content */}
+                    <main className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+                        
+                        {/* 1. System Overview */}
+                        <section className="mb-16">
+                            <h2 className="text-3xl font-bold text-gray-800 border-b-2 border-blue-500 pb-2 mb-8">What We Do</h2>
+                            <div className="bg-white p-8 rounded-xl shadow-2xl">
+                                <p className="text-lg text-gray-700 leading-relaxed">
+                                    Our system provides a robust, real-time framework for organizations to move beyond static risk audits. We transform complex internal and external data streams into actionable vulnerability scores, ensuring management has the precise information needed to allocate resources proactively. This platform is built on the principle of **Predictive Resilience**, enabling organizations to anticipate shocks and adapt strategies before failure occurs.
+                                </p>
+                                <div className="mt-8 text-center">
+                                    <span className="inline-block px-4 py-2 bg-blue-100 text-blue-800 text-sm font-semibold rounded-full shadow-md">
+                                        Focus: Enhanced SPARC Capabilities & Strategic Foresight
+                                    </span>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* 2. The PCSP Framework (Our Operational Cycle) */}
+                        <section className="mb-16">
+                            <h2 className="text-3xl font-bold text-gray-800 border-b-2 border-blue-500 pb-2 mb-8">The PCSP Framework: A Continuous Cycle</h2>
+                            <p className="text-lg text-gray-700 mb-8">
+                                The system is governed by the **PCSP** cycle, our core methodology for continuous organizational resilience management:
+                            </p>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                <PCSPComponent 
+                                    letter="P" 
+                                    title="Plan" 
+                                    description="Establish data collection, define key risk indicators (KRIs), and set resilience targets."
+                                    bgColor="bg-blue-600"
+                                    textColor="text-white"
+                                />
+                                <PCSPComponent 
+                                    letter="C" 
+                                    title="Conduct" 
+                                    description="Execute real-time data ingestion, run dynamic scenario simulations, and monitor baseline vulnerabilities."
+                                    bgColor="bg-white border-2 border-blue-600"
+                                    textColor="text-blue-800"
+                                />
+                                <PCSPComponent 
+                                    letter="S" 
+                                    title="Summarize" 
+                                    description="Generate vulnerability scores, visualize resilience gaps (e.g., Radar Charts), and produce actionable reports."
+                                    bgColor="bg-blue-600"
+                                    textColor="text-white"
+                                />
+                                <PCSPComponent 
+                                    letter="P" 
+                                    title="Perfect" 
+                                    description="Integrate lessons learned, refine risk models, and adapt organizational strategy for continuous improvement."
+                                    bgColor="bg-white border-2 border-blue-600"
+                                    textColor="text-blue-800"
+                                />
+                            </div>
+                            
+                            <div className="mt-10 text-center">
+                                <p className="text-gray-500 italic">
+                                    
+                                </p>
+                            </div>
+                        </section>
+
+                        {/* 3. Key Features */}
+                        <section className="mb-16">
+                            <h2 className="text-3xl font-bold text-gray-800 border-b-2 border-blue-500 pb-2 mb-8">Data-Driven Features</h2>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                <FeatureCard
+                                    icon={Database}
+                                    title="Automated Data Pipeline"
+                                    description="Ingest structured and unstructured data from internal systems, market feeds, and external risk monitors seamlessly."
+                                    color="border-t-4 border-yellow-500"
+                                />
+                                <FeatureCard
+                                    icon={Target}
+                                    title="Predictive Vulnerability Scoring"
+                                    description="Utilize machine learning models to calculate forward-looking vulnerability indices based on dynamic data inputs."
+                                    color="border-t-4 border-red-500"
+                                />
+                                <FeatureCard
+                                    icon={Zap}
+                                    title="Real-Time Stress Testing"
+                                    description="Run instant simulations of disruptive events (e.g., supply chain failure, cyber attack) to assess Coping Capacity (C)."
+                                    color="border-t-4 border-green-500"
+                                />
+                            </div>
+                        </section>
+
+                        {/* 4. Benefits Section */}
+                        <section>
+                            <h2 className="text-3xl font-bold text-gray-800 border-b-2 border-blue-500 pb-2 mb-8">Organizational Benefits</h2>
+                            
+                            <div className="bg-blue-50 p-8 rounded-xl shadow-inner">
+                                <ul className="space-y-4 text-gray-700 text-lg">
+                                    <li className="flex items-start">
+                                        <TrendingUp className="w-6 h-6 mr-3 mt-1 text-blue-600 flex-shrink-0" />
+                                        <div>
+                                            <span className="font-semibold">Optimized Investment:</span> Pinpoint the exact resilience components (C, A, S, E) requiring investment, shifting from generic protection to targeted strategic growth.
+                                        </div>
+                                    </li>
+                                    <li className="flex items-start">
+                                        <TrendingUp className="w-6 h-6 mr-3 mt-1 text-blue-600 flex-shrink-0" />
+                                        <div>
+                                            <span className="font-semibold">Faster Decision Cycles:</span> Reduce crisis response time by providing pre-calculated, validated options for real-time leadership (MOVE).
+                                        </div>
+                                    </li>
+                                    <li className="flex items-start">
+                                        <TrendingUp className="w-6 h-6 mr-3 mt-1 text-blue-600 flex-shrink-0" />
+                                        <div>
+                                            <span className="font-semibold">Competitive Advantage:</span> Transform risk management from a compliance function into a source of strategic Adaptability (A) and market foresight.
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </section>
+                    </main>
+                </div>
+            );
+        };
+
+        // Render the application using React 18 createRoot
+        window.onload = () => {
+          const container = document.getElementById('root');
+          const root = ReactDOM.createRoot(container);
+          root.render(<AboutApp />);
+        };
+    </script>
+</body>
+</html>
