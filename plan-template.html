@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSCP Workbench - Public Service Continuity Plan</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Use Inter font family -->
+    <style>
+        :root {
+            --color-primary: #10b981; /* Emerald Green */
+            --color-secondary: #f97316; /* Orange */
+            --color-background: #f8fafc; /* Light Blue/Gray */
+            --color-surface: #ffffff;
+            --color-text: #1f2937;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--color-background);
+            color: var(--color-text);
+        }
+
+        /* Custom Scrollbar for reliable view */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Ensure smooth navigation transitions */
+        .content-section {
+            transition: opacity 0.3s ease-in-out;
+            min-height: 80vh;
+        }
+        .content-section.hidden {
+            display: none;
+            opacity: 0;
+        }
+
+        /* Style for interactive inputs/tables */
+        .data-input {
+            border: 1px solid #d1d5db;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            width: 100%;
+            transition: border-color 0.2s;
+        }
+        .data-input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 1px var(--color-primary);
+        }
+        
+        /* Table headers to be sticky on scroll */
+        .sticky-header th {
+            position: sticky;
+            top: 0;
+            background-color: #f1f5f9;
+            z-index: 10;
+        }
+
+        /* Focus styles for the main content box */
+        .pscp-card {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e5e7eb;
+        }
+    </style>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="flex flex-col min-h-screen">
+    <!-- Header/Title Section -->
+    <header class="bg-white shadow-md sticky top-0 z-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row justify-between items-start md:items-center">
+            <h1 class="text-3xl font-bold text-gray-900">PSCP Workbench</h1>
+            <p class="text-sm text-gray-500 mt-1 md:mt-0">Public Service Continuity Plan (PWA Format)</p>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Navigation Tabs -->
+        <nav class="mb-8 border-b border-gray-200">
+            <div class="flex flex-wrap -mb-px" id="pscp-tabs">
+                <button class="tab-item py-3 px-4 text-sm font-medium text-center border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 transition-colors active-tab" onclick="showSection('control')">
+                    1. Control & Approval
+                </button>
+                <button class="tab-item py-3 px-4 text-sm font-medium text-center border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 transition-colors" onclick="showSection('governance')">
+                    2. Governance
+                </button>
+                <button class="tab-item py-3 px-4 text-sm font-medium text-center border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 transition-colors" onclick="showSection('bia')">
+                    3. BIA & Risk
+                </button>
+                <button class="tab-item py-3 px-4 text-sm font-medium text-center border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 transition-colors" onclick="showSection('strategies')">
+                    4. Strategies
+                </button>
+                <button class="tab-item py-3 px-4 text-sm font-medium text-center border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 transition-colors" onclick="showSection('procedures')">
+                    5. Procedures
+                </button>
+                <button class="tab-item py-3 px-4 text-sm font-medium text-center border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 transition-colors" onclick="showSection('maintenance')">
+                    6. Maintenance
+                </button>
+            </div>
+        </nav>
+
+        <!-- Dynamic Content Sections -->
+        <div class="bg-white pscp-card p-6 md:p-10 rounded-lg shadow-lg">
+            
+            <!-- SECTION 1: Document Control and Approval -->
+            <section id="control" class="content-section">
+                <h2 class="text-2xl font-semibold mb-6 text-gray-800 border-b pb-2">1. Document Control and Approval</h2>
+
+                <div class="space-y-4 mb-8">
+                    <h3 class="text-xl font-medium text-gray-700">Document Control</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <label class="block">
+                            <span class="text-gray-600 text-sm">Organization Name (LGU/Agency)</span>
+                            <input type="text" id="orgName" value="[Insert Name of LGU/Agency]" class="data-input mt-1">
+                        </label>
+                        <label class="block">
+                            <span class="text-gray-600 text-sm">Document Version</span>
+                            <input type="text" id="docVersion" value="1.0 (Initial Release)" class="data-input mt-1">
+                        </label>
+                        <label class="block">
+                            <span class="text-gray-600 text-sm">Date of Next Review</span>
+                            <input type="date" id="nextReviewDate" value="2026-01-01" class="data-input mt-1">
+                        </label>
+                        <label class="block">
+                            <span class="text-gray-600 text-sm">Plan Owner/Coordinator</span>
+                            <input type="text" id="planOwner" value="[Name and Title]" class="data-input mt-1">
+                        </label>
+                    </div>
+                </div>
+
+                <h3 class="text-xl font-medium text-gray-700 mb-4">Version History</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50 sticky-header">
+                            <tr>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Version</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description of Change</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Author</th>
+                                <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="versionHistoryBody" class="bg-white divide-y divide-gray-200">
+                            <!-- Rows loaded by JS -->
+                        </tbody>
+                    </table>
+                    <button onclick="addVersionHistoryRow()" class="mt-4 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-300 transition-colors font-medium">Add Version Entry</button>
+                </div>
+            </section>
+
+            <!-- SECTION 2: PSCP Governance and Organization -->
+            <section id="governance" class="content-section hidden">
+                <h2 class="text-2xl font-semibold mb-6 text-gray-800 border-b pb-2">2. PSCP Governance and Organization</h2>
+
+                <h3 class="text-xl font-medium text-gray-700 mb-4">2.1. Command and Control Structure (CMT)</h3>
+                <div class="overflow-x-auto mb-8">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50 sticky-header">
+                            <tr>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Responsibility</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Primary Contact</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Secondary Contact</th>
+                                <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cmtBody" class="bg-white divide-y divide-gray-200">
+                            <!-- Rows loaded by JS -->
+                        </tbody>
+                    </table>
+                    <button onclick="addCmtRow()" class="mt-4 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-300 transition-colors font-medium">Add CMT Role</button>
+                </div>
+
+                <h3 class="text-xl font-medium text-gray-700 mb-4">2.2. PSCP Team & Core Personnel</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50 sticky-header">
+                            <tr>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role in PSCP</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department/Section</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact (Cell/Satellite)</th>
+                                <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="personnelBody" class="bg-white divide-y divide-gray-200">
+                            <!-- Rows loaded by JS -->
+                        </tbody>
+                    </table>
+                    <button onclick="addPersonnelRow()" class="mt-4 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-300 transition-colors font-medium">Add Core Personnel</button>
+                </div>
+            </section>
+            
+            <!-- SECTION 3: Business Impact Analysis (BIA) & Risk Assessment -->
+            <section id="bia" class="content-section hidden">
+                <h2 class="text-2xl font-semibold mb-6 text-gray-800 border-b pb-2">3. BIA & Risk Assessment</h2>
+
+                <h3 class="text-xl font-medium text-gray-700 mb-4">3.1. Critical Public Services Identification</h3>
+                <p class="text-sm text-gray-500 mb-4">Define RTO (Recovery Time Objective) and RPO (Recovery Point Objective).</p>
+                <div class="overflow-x-auto mb-8">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50 sticky-header">
+                            <tr>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">Critical Service / Function</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">Target RTO</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">Target RPO</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3">Required Resources</th>
+                                <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="criticalServicesBody" class="bg-white divide-y divide-gray-200">
+                            <!-- Rows loaded by JS -->
+                        </tbody>
+                    </table>
+                    <button onclick="addServiceRow()" class="mt-4 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-300 transition-colors font-medium">Add Critical Service</button>
+                </div>
+
+                <h3 class="text-xl font-medium text-gray-700 mb-4">3.2. Hazard and Risk Assessment</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50 sticky-header">
+                            <tr>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">Hazard/Threat</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">Likelihood</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">Impact</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3">Mitigation Measures in Place</th>
+                                <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="riskAssessmentBody" class="bg-white divide-y divide-gray-200">
+                            <!-- Rows loaded by JS -->
+                        </tbody>
+                    </table>
+                    <button onclick="addRiskRow()" class="mt-4 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-300 transition-colors font-medium">Add Hazard/Threat</button>
+                </div>
+            </section>
+            
+            <!-- SECTION 4: Continuity Strategies -->
+            <section id="strategies" class="content-section hidden">
+                <h2 class="text-2xl font-semibold mb-6 text-gray-800 border-b pb-2">4. Continuity Strategies</h2>
+
+                <h3 class="text-xl font-medium text-gray-700 mb-4">4.1. Alternate Operating Sites</h3>
+                <div class="overflow-x-auto mb-8">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50 sticky-header">
+                            <tr>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">Alternate Site Location</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">Capacity (Personnel)</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">Key Facilities Available</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">Transportation/Accessibility</th>
+                                <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="altSitesBody" class="bg-white divide-y divide-gray-200">
+                            <!-- Rows loaded by JS -->
+                        </tbody>
+                    </table>
+                    <button onclick="addAltSiteRow()" class="mt-4 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-300 transition-colors font-medium">Add Alternate Site</button>
+                </div>
+                
+                <h3 class="text-xl font-medium text-gray-700 mb-4">4.2. Vital Records and Data Management</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50 sticky-header">
+                            <tr>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">Vital Record/System</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">Type</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">Location of Backup/Copy</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">Recovery Method</th>
+                                <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vitalRecordsBody" class="bg-white divide-y divide-gray-200">
+                            <!-- Rows loaded by JS -->
+                        </tbody>
+                    </table>
+                    <button onclick="addVitalRecordRow()" class="mt-4 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-300 transition-colors font-medium">Add Vital Record</button>
+                </div>
+            </section>
+            
+            <!-- SECTION 5: Activation, Response, and Recovery Procedures -->
+            <section id="procedures" class="content-section hidden">
+                <h2 class="text-2xl font-semibold mb-6 text-gray-800 border-b pb-2">5. Activation, Response, and Recovery Procedures</h2>
+                
+                <h3 class="text-xl font-medium text-gray-700 mb-4">5.1. Incident Classification and Activation Criteria</h3>
+                <div class="overflow-x-auto mb-8">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50 sticky-header">
+                            <tr>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">Incident Level</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3">Description / Impact</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">Activation Authority</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3">Immediate Action</th>
+                                <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activationCriteriaBody" class="bg-white divide-y divide-gray-200">
+                            <!-- Rows loaded by JS -->
+                        </tbody>
+                    </table>
+                    <button onclick="addCriteriaRow()" class="mt-4 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-300 transition-colors font-medium">Add Activation Criteria</button>
+                </div>
+                
+                <h3 class="text-xl font-medium text-gray-700 mb-4">5.3. Immediate Action Checklist (First 4 Hours)</h3>
+                <div class="overflow-x-auto mb-8">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50 sticky-header">
+                            <tr>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">Task</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">Responsible Role</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">Notes</th>
+                                <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/10">Status</th>
+                                <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="actionChecklistBody" class="bg-white divide-y divide-gray-200">
+                            <!-- Rows loaded by JS -->
+                        </tbody>
+                    </table>
+                    <button onclick="addActionChecklistRow()" class="mt-4 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-300 transition-colors font-medium">Add Checklist Item</button>
+                </div>
+
+                <h3 class="text-xl font-medium text-gray-700 mb-4">5.4. Critical Service Recovery Tasks</h3>
+                <p class="text-sm text-gray-500 mb-4">Detailed step-by-step procedures for resuming each critical service at the alternate site.</p>
+                <div id="recoveryTasksContainer" class="space-y-6">
+                    <!-- Service Recovery Blocks loaded by JS -->
+                </div>
+            </section>
+            
+            <!-- SECTION 6: Plan Maintenance, Training, and Testing -->
+            <section id="maintenance" class="content-section hidden">
+                <h2 class="text-2xl font-semibold mb-6 text-gray-800 border-b pb-2">6. Plan Maintenance, Training, and Testing</h2>
+
+                <h3 class="text-xl font-medium text-gray-700 mb-4">6.1. Review and Maintenance Schedule</h3>
+                <div class="overflow-x-auto mb-8">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50 sticky-header">
+                            <tr>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">Activity</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">Frequency</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">Responsible Role</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">Last Completed Date</th>
+                                <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="maintenanceBody" class="bg-white divide-y divide-gray-200">
+                            <!-- Rows loaded by JS -->
+                        </tbody>
+                    </table>
+                    <button onclick="addMaintenanceRow()" class="mt-4 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-300 transition-colors font-medium">Add Maintenance Activity</button>
+                </div>
+                
+                <h3 class="text-xl font-medium text-gray-700 mb-4">6.3. Testing and Exercise Schedule</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50 sticky-header">
+                            <tr>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">Date</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">Type of Exercise</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3">Objectives</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">Status/Outcome Summary</th>
+                                <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="testingBody" class="bg-white divide-y divide-gray-200">
+                            <!-- Rows loaded by JS -->
+                        </tbody>
+                    </table>
+                    <button onclick="addTestingRow()" class="mt-4 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-300 transition-colors font-medium">Add Testing Entry</button>
+                </div>
+                
+                <!-- Section 7 (Appendices) is covered by data loading in the JS for a more centralized view, but the sections can be added here if they were more than simple tables -->
+            </section>
+        </div>
+    </div>
+
+    <!-- Footer for general info -->
+    <footer class="bg-gray-100 mt-8 py-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-gray-500">
+            <p>&copy; <span id="currentYear"></span> [Insert Organization Name]. All Rights Reserved. This plan is confidential and for internal use only.</p>
+        </div>
+    </footer>
+
+    <!-- Firebase SDK Imports -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection, query, orderBy, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        // --- Global Variables (Canvas Environment) ---
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'pscp-workbench-default';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let db;
+        let auth;
+        let userId = null;
+        let pscpDataRef;
+
+        // --- Data Structure Initialization ---
+        let pscpData = {
+            metadata: {
+                orgName: "[Insert Name of LGU/Agency]",
+                docVersion: "1.0 (Initial Release)",
+                nextReviewDate: "",
+                planOwner: "[Name and Title]",
+                primaryContact: "[Contact Number]",
+                policyStatement: "The [Agency Name] is committed to the safety of its personnel and the sustained delivery of critical public services, regardless of the nature or scale of a disruption."
+            },
+            versionHistory: [
+                { id: 1, version: '0.1', date: '', description: 'Initial draft based on Guidebook guidelines.', author: '[Name]' },
+                { id: 2, version: '1.0', date: '', description: 'Final review and approval.', author: '[Name]' },
+            ],
+            cmt: [
+                { id: 1, role: 'CMT Leader (Head of Agency/Designee)', responsibility: 'Final decision-making authority, communication with external authorities.', primaryContact: '[Name/Number]', secondaryContact: '[Name/Number]' },
+                { id: 2, role: 'Operations Lead', responsibility: 'Manages the execution of critical service recovery tasks.', primaryContact: '[Name/Number]', secondaryContact: '[Name/Number]' },
+            ],
+            personnel: [
+                { id: 1, name: '[Name]', role: 'Core Service Team 1 Leader', dept: '[Dept Name]', contact: '[Number]' },
+                { id: 2, name: '[Name]', role: 'Vital Records Custodian', dept: '[Dept Name]', contact: '[Number]' },
+            ],
+            criticalServices: [
+                { id: 1, service: 'Emergency Response Dispatch', rto: '4 hours', rpo: '1 hour', resources: 'Dispatchers, GIS System, Radio Comms' },
+                { id: 2, service: 'Basic Health Service Delivery', rto: '24 hours', rpo: '4 hours', resources: 'Medical Kits, Transport, Field Personnel' },
+            ],
+            riskAssessment: [
+                { id: 1, hazard: 'Major Typhoon/Flood', likelihood: 'High', impact: 'High', mitigation: 'Evacuation routes defined, backup generator, sandbag procedures.' },
+                { id: 2, hazard: 'Cyber Attack/Data Loss', likelihood: 'Medium', impact: 'High', mitigation: 'Regular backups, off-site storage, multi-factor authentication.' },
+            ],
+            altSites: [
+                { id: 1, location: 'Primary Alt Site', capacity: '[Capacity]', facilities: 'Dedicated generator, Satellite Internet', accessibility: '[Route/Access Details]' },
+            ],
+            vitalRecords: [
+                { id: 1, record: 'Personnel Records', type: 'Digital', location: 'Cloud Storage (Encrypted)', recoveryMethod: 'Procedure VR-101' },
+            ],
+            activationCriteria: [
+                { id: 1, level: 'Level 1 (Minor)', impact: 'Localized disruption. Minimal impact on critical services.', authority: 'Section Head', action: 'Internal mitigation, no PSCP activation.' },
+                { id: 2, level: 'Level 3 (Major)', impact: 'Complete loss of primary facility or widespread disaster.', authority: 'Head of Agency/CMT Leader', action: 'Full PSCP Activation and relocation to Alternate Site.' },
+            ],
+            actionChecklist: [
+                { id: 1, task: '1. Incident Verification and Declaration', role: 'CMT Leader', notes: 'Use defined criteria in Section 5.1.', status: 'Pending' },
+                { id: 2, task: '3. Initiate Staff Notification', role: 'Communications Lead', notes: 'Send alert to all relevant personnel via [Primary Method].', status: 'Pending' },
+                { id: 3, task: '5. Mobilize to Alternate Site', role: 'Logistics Lead', notes: 'Direct Core Personnel to the designated Primary Alt Site.', status: 'Pending' },
+            ],
+            recoverySteps: [
+                { id: 1, serviceId: 1, task: 'Power up/Verify IT infrastructure at Alternate Site.', role: 'IT/Technical Lead', time: '1 Hour' },
+                { id: 2, serviceId: 1, task: 'Restore GIS System from the off-site backup.', role: 'IT/Technical Lead', time: '30 Mins' },
+                { id: 3, serviceId: 2, task: 'Mobilize medical teams to designated field posts.', role: 'Operations Lead', time: '2 Hours' },
+            ],
+            maintenance: [
+                { id: 1, activity: 'Full PSCP Document Review', frequency: 'Annually', role: 'PSCP Coordinator', lastCompleted: '' },
+                { id: 2, activity: 'Vital Records Backup Verification', frequency: 'Quarterly', role: 'Vital Records Custodian', lastCompleted: '' },
+            ],
+            testing: [
+                { id: 1, date: '', type: 'Tabletop', objectives: 'Validate RTO for Service 1 and CMT decision-making.', summary: '[Summary of results/lessons learned]' },
+            ],
+            nextIds: {
+                versionHistory: 3, cmt: 3, personnel: 3, criticalServices: 3, riskAssessment: 3, altSites: 2, vitalRecords: 2, activationCriteria: 3, actionChecklist: 4, recoverySteps: 4, maintenance: 3, testing: 2
+            }
+        };
+
+        // --- Firebase Initialization and Authentication ---
+        if (firebaseConfig) {
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                // setLogLevel('debug'); // Enable for detailed logging
+
+                if (initialAuthToken) {
+                    signInWithCustomToken(auth, initialAuthToken).catch(error => {
+                        console.error("Firebase Custom Auth failed:", error);
+                        signInAnonymously(auth); // Fallback to anonymous
+                    });
+                } else {
+                    signInAnonymously(auth); // Sign in anonymously if no token
+                }
+
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        // Public data path: /artifacts/{appId}/public/data/{collection_name}/
+                        pscpDataRef = doc(db, 'artifacts', appId, 'public', 'data', 'pscpData', 'document');
+                        
+                        // Start real-time listener after authentication
+                        setupRealtimeListener();
+                    } else {
+                        // User is signed out or anonymous sign-in failed
+                        console.log("No user signed in. Using default data.");
+                        // Still render tables with default data
+                        renderAll(); 
+                    }
+                });
+
+            } catch (error) {
+                console.error("Firebase initialization failed:", error);
+                // Fallback to render with default data if Firebase fails
+                renderAll(); 
+            }
+        } else {
+            console.warn("Firebase configuration not provided. Using default data.");
+            renderAll();
+        }
+
+        function setupRealtimeListener() {
+            if (pscpDataRef && userId) {
+                onSnapshot(pscpDataRef, (doc) => {
+                    if (doc.exists()) {
+                        // Load and render data from Firestore
+                        const data = doc.data();
+                        // Check for mandatory fields before merging/overwriting
+                        if (data.metadata && data.versionHistory) {
+                            pscpData = data;
+                            renderAll();
+                        } else {
+                            console.warn("Firestore document found but appears incomplete. Using cached data.");
+                            renderAll();
+                            saveData(); // Attempt to save the current default data structure
+                        }
+                    } else {
+                        // Document doesn't exist, save default data to Firestore
+                        console.log("No PSCP document found in Firestore. Creating new one.");
+                        saveData(); 
+                    }
+                }, (error) => {
+                    console.error("Error setting up Firestore listener:", error);
+                });
+            }
+        }
+
+        // --- Data Manipulation and Persistence ---
+        function saveData() {
+            if (pscpDataRef && userId) {
+                // IMPORTANT: Use JSON.stringify/JSON.parse for complex nested structures if needed, 
+                // but for this simple structure, direct save is fine.
+                setDoc(pscpDataRef, pscpData).catch(error => {
+                    console.error("Error writing document to Firestore:", error);
+                });
+            } else {
+                console.warn("Cannot save data: Firebase not initialized or user not authenticated.");
+            }
+        }
+
+        function updateMetadata(field, elementId) {
+            const value = document.getElementById(elementId).value;
+            pscpData.metadata[field] = value;
+            saveData();
+        }
+
+        function updateTableData(section, id, field, event) {
+            const value = event.target.value;
+            const index = pscpData[section].findIndex(item => item.id === id);
+            if (index !== -1) {
+                pscpData[section][index][field] = value;
+                saveData();
+            }
+        }
+
+        function deleteRow(section, id) {
+            pscpData[section] = pscpData[section].filter(item => item.id !== id);
+            saveData();
+        }
+        
+        function addRow(section, newRowDefaults) {
+            const newId = pscpData.nextIds[section] || 1;
+            const newRow = { id: newId, ...newRowDefaults };
+            pscpData[section].push(newRow);
+            pscpData.nextIds[section] = newId + 1;
+            saveData();
+        }
+
+        // --- Row Addition Functions (Using the addRow helper) ---
+        window.addVersionHistoryRow = () => addRow('versionHistory', { version: '', date: new Date().toISOString().slice(0, 10), description: '', author: '' });
+        window.addCmtRow = () => addRow('cmt', { role: '[New Role]', responsibility: '[Responsibility]', primaryContact: '', secondaryContact: '' });
+        window.addPersonnelRow = () => addRow('personnel', { name: '', role: '', dept: '', contact: '' });
+        window.addServiceRow = () => addRow('criticalServices', { service: '', rto: '', rpo: '', resources: '' });
+        window.addRiskRow = () => addRow('riskAssessment', { hazard: '', likelihood: 'Medium', impact: 'Medium', mitigation: '' });
+        window.addAltSiteRow = () => addRow('altSites', { location: '', capacity: '', facilities: '', accessibility: '' });
+        window.addVitalRecordRow = () => addRow('vitalRecords', { record: '', type: 'Digital', location: '', recoveryMethod: '' });
+        window.addCriteriaRow = () => addRow('activationCriteria', { level: '', impact: '', authority: '', action: '' });
+        window.addActionChecklistRow = () => addRow('actionChecklist', { task: '', role: '', notes: '', status: 'Pending' });
+        window.addMaintenanceRow = () => addRow('maintenance', { activity: '', frequency: 'Annually', role: '', lastCompleted: '' });
+        window.addTestingRow = () => addRow('testing', { date: '', type: 'Tabletop', objectives: '', summary: '' });
+
+        // Recovery Step addition is slightly more complex as it needs a service ID
+        window.addRecoveryStep = (serviceId) => {
+             const newId = pscpData.nextIds['recoverySteps'] || 1;
+             pscpData.recoverySteps.push({ id: newId, serviceId: serviceId, task: '', role: '', time: '' });
+             pscpData.nextIds['recoverySteps'] = newId + 1;
+             saveData();
+        }
+        window.deleteRecoveryStep = deleteRow.bind(null, 'recoverySteps');
+        window.deleteRow = deleteRow; // Expose to window for generic table rows
+
+        // --- Rendering Functions (Populate HTML) ---
+
+        function renderMetadata() {
+            // Document Control
+            document.getElementById('orgName').value = pscpData.metadata.orgName;
+            document.getElementById('docVersion').value = pscpData.metadata.docVersion;
+            document.getElementById('nextReviewDate').value = pscpData.metadata.nextReviewDate;
+            document.getElementById('planOwner').value = pscpData.metadata.planOwner;
+            // The footer is also updated
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+            document.querySelector('footer p').innerHTML = document.querySelector('footer p').innerHTML.replace(/\[Insert Organization Name\]/g, pscpData.metadata.orgName);
+
+            // Attach listeners to update metadata directly on change
+            document.getElementById('orgName').onchange = (e) => updateMetadata('orgName', 'orgName');
+            document.getElementById('docVersion').onchange = (e) => updateMetadata('docVersion', 'docVersion');
+            document.getElementById('nextReviewDate').onchange = (e) => updateMetadata('nextReviewDate', 'nextReviewDate');
+            document.getElementById('planOwner').onchange = (e) => updateMetadata('planOwner', 'planOwner');
+        }
+
+        function renderVersionHistory() {
+            const body = document.getElementById('versionHistoryBody');
+            body.innerHTML = pscpData.versionHistory.map(row => `
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-3 py-2 whitespace-nowrap"><input type="text" value="${row.version}" onchange="updateTableData('versionHistory', ${row.id}, 'version', event)" class="data-input"></td>
+                    <td class="px-3 py-2 whitespace-nowrap"><input type="date" value="${row.date}" onchange="updateTableData('versionHistory', ${row.id}, 'date', event)" class="data-input"></td>
+                    <td class="px-3 py-2"><input type="text" value="${row.description}" onchange="updateTableData('versionHistory', ${row.id}, 'description', event)" class="data-input"></td>
+                    <td class="px-3 py-2 whitespace-nowrap"><input type="text" value="${row.author}" onchange="updateTableData('versionHistory', ${row.id}, 'author', event)" class="data-input"></td>
+                    <td class="px-3 py-2 text-center"><button onclick="deleteRow('versionHistory', ${row.id})" class="text-red-600 hover:text-red-800 transition-colors">Delete</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function renderCmt() {
+            const body = document.getElementById('cmtBody');
+            body.innerHTML = pscpData.cmt.map(row => `
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-3 py-2"><input type="text" value="${row.role}" onchange="updateTableData('cmt', ${row.id}, 'role', event)" class="data-input"></td>
+                    <td class="px-3 py-2"><input type="text" value="${row.responsibility}" onchange="updateTableData('cmt', ${row.id}, 'responsibility', event)" class="data-input"></td>
+                    <td class="px-3 py-2 whitespace-nowrap"><input type="text" value="${row.primaryContact}" onchange="updateTableData('cmt', ${row.id}, 'primaryContact', event)" class="data-input"></td>
+                    <td class="px-3 py-2 whitespace-nowrap"><input type="text" value="${row.secondaryContact}" onchange="updateTableData('cmt', ${row.id}, 'secondaryContact', event)" class="data-input"></td>
+                    <td class="px-3 py-2 text-center"><button onclick="deleteRow('cmt', ${row.id})" class="text-red-600 hover:text-red-800 transition-colors">Delete</button></td>
+                </tr>
+            `).join('');
+        }
+        
+        function renderPersonnel() {
+            const body = document.getElementById('personnelBody');
+            body.innerHTML = pscpData.personnel.map(row => `
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-3 py-2"><input type="text" value="${row.name}" onchange="updateTableData('personnel', ${row.id}, 'name', event)" class="data-input"></td>
+                    <td class="px-3 py-2"><input type="text" value="${row.role}" onchange="updateTableData('personnel', ${row.id}, 'role', event)" class="data-input"></td>
+                    <td class="px-3 py-2"><input type="text" value="${row.dept}" onchange="updateTableData('personnel', ${row.id}, 'dept', event)" class="data-input"></td>
+                    <td class="px-3 py-2 whitespace-nowrap"><input type="text" value="${row.contact}" onchange="updateTableData('personnel', ${row.id}, 'contact', event)" class="data-input"></td>
+                    <td class="px-3 py-2 text-center"><button onclick="deleteRow('personnel', ${row.id})" class="text-red-600 hover:text-red-800 transition-colors">Delete</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function renderCriticalServices() {
+            const body = document.getElementById('criticalServicesBody');
+            body.innerHTML = pscpData.criticalServices.map(row => `
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-3 py-2"><input type="text" value="${row.service}" onchange="updateTableData('criticalServices', ${row.id}, 'service', event)" class="data-input"></td>
+                    <td class="px-3 py-2 whitespace-nowrap"><input type="text" value="${row.rto}" onchange="updateTableData('criticalServices', ${row.id}, 'rto', event)" class="data-input"></td>
+                    <td class="px-3 py-2 whitespace-nowrap"><input type="text" value="${row.rpo}" onchange="updateTableData('criticalServices', ${row.id}, 'rpo', event)" class="data-input"></td>
+                    <td class="px-3 py-2"><input type="text" value="${row.resources}" onchange="updateTableData('criticalServices', ${row.id}, 'resources', event)" class="data-input"></td>
+                    <td class="px-3 py-2 text-center"><button onclick="deleteRow('criticalServices', ${row.id})" class="text-red-600 hover:text-red-800 transition-colors">Delete</button></td>
+                </tr>
+            `).join('');
+        }
+        
+        function renderRiskAssessment() {
+            const body = document.getElementById('riskAssessmentBody');
+            const options = (selected) => ['Low', 'Medium', 'High'].map(o => `<option value="${o}" ${o === selected ? 'selected' : ''}>${o}</option>`).join('');
+            
+            body.innerHTML = pscpData.riskAssessment.map(row => `
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-3 py-2"><input type="text" value="${row.hazard}" onchange="updateTableData('riskAssessment', ${row.id}, 'hazard', event)" class="data-input"></td>
+                    <td class="px-3 py-2 whitespace-nowrap">
+                        <select onchange="updateTableData('riskAssessment', ${row.id}, 'likelihood', event)" class="data-input">
+                            ${options(row.likelihood)}
+                        </select>
+                    </td>
+                    <td class="px-3 py-2 whitespace-nowrap">
+                        <select onchange="updateTableData('riskAssessment', ${row.id}, 'impact', event)" class="data-input">
+                            ${options(row.impact)}
+                        </select>
+                    </td>
+                    <td class="px-3 py-2"><textarea onchange="updateTableData('riskAssessment', ${row.id}, 'mitigation', event)" rows="2" class="data-input">${row.mitigation}</textarea></td>
+                    <td class="px-3 py-2 text-center"><button onclick="deleteRow('riskAssessment', ${row.id})" class="text-red-600 hover:text-red-800 transition-colors">Delete</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function renderAltSites() {
+            const body = document.getElementById('altSitesBody');
+            body.innerHTML = pscpData.altSites.map(row => `
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-3 py-2"><input type="text" value="${row.location}" onchange="updateTableData('altSites', ${row.id}, 'location', event)" class="data-input"></td>
+                    <td class="px-3 py-2 whitespace-nowrap"><input type="text" value="${row.capacity}" onchange="updateTableData('altSites', ${row.id}, 'capacity', event)" class="data-input"></td>
+                    <td class="px-3 py-2"><input type="text" value="${row.facilities}" onchange="updateTableData('altSites', ${row.id}, 'facilities', event)" class="data-input"></td>
+                    <td class="px-3 py-2"><input type="text" value="${row.accessibility}" onchange="updateTableData('altSites', ${row.id}, 'accessibility', event)" class="data-input"></td>
+                    <td class="px-3 py-2 text-center"><button onclick="deleteRow('altSites', ${row.id})" class="text-red-600 hover:text-red-800 transition-colors">Delete</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function renderVitalRecords() {
+            const body = document.getElementById('vitalRecordsBody');
+            body.innerHTML = pscpData.vitalRecords.map(row => `
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-3 py-2"><input type="text" value="${row.record}" onchange="updateTableData('vitalRecords', ${row.id}, 'record', event)" class="data-input"></td>
+                    <td class="px-3 py-2 whitespace-nowrap"><input type="text" value="${row.type}" onchange="updateTableData('vitalRecords', ${row.id}, 'type', event)" class="data-input"></td>
+                    <td class="px-3 py-2"><input type="text" value="${row.location}" onchange="updateTableData('vitalRecords', ${row.id}, 'location', event)" class="data-input"></td>
+                    <td class="px-3 py-2"><input type="text" value="${row.recoveryMethod}" onchange="updateTableData('vitalRecords', ${row.id}, 'recoveryMethod', event)" class="data-input"></td>
+                    <td class="px-3 py-2 text-center"><button onclick="deleteRow('vitalRecords', ${row.id})" class="text-red-600 hover:text-red-800 transition-colors">Delete</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function renderActivationCriteria() {
+            const body = document.getElementById('activationCriteriaBody');
+            body.innerHTML = pscpData.activationCriteria.map(row => `
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-3 py-2"><input type="text" value="${row.level}" onchange="updateTableData('activationCriteria', ${row.id}, 'level', event)" class="data-input"></td>
+                    <td class="px-3 py-2"><textarea onchange="updateTableData('activationCriteria', ${row.id}, 'impact', event)" rows="2" class="data-input">${row.impact}</textarea></td>
+                    <td class="px-3 py-2"><input type="text" value="${row.authority}" onchange="updateTableData('activationCriteria', ${row.id}, 'authority', event)" class="data-input"></td>
+                    <td class="px-3 py-2"><textarea onchange="updateTableData('activationCriteria', ${row.id}, 'action', event)" rows="2" class="data-input">${row.action}</textarea></td>
+                    <td class="px-3 py-2 text-center"><button onclick="deleteRow('activationCriteria', ${row.id})" class="text-red-600 hover:text-red-800 transition-colors">Delete</button></td>
+                </tr>
+            `).join('');
+        }
+        
+        function renderActionChecklist() {
+            const body = document.getElementById('actionChecklistBody');
+            const statusOptions = (selected) => ['Pending', 'In Progress', 'Done'].map(o => `<option value="${o}" ${o === selected ? 'selected' : ''}>${o}</option>`).join('');
+            
+            body.innerHTML = pscpData.actionChecklist.map(row => `
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-3 py-2"><input type="text" value="${row.task}" onchange="updateTableData('actionChecklist', ${row.id}, 'task', event)" class="data-input"></td>
+                    <td class="px-3 py-2"><input type="text" value="${row.role}" onchange="updateTableData('actionChecklist', ${row.id}, 'role', event)" class="data-input"></td>
+                    <td class="px-3 py-2"><input type="text" value="${row.notes}" onchange="updateTableData('actionChecklist', ${row.id}, 'notes', event)" class="data-input"></td>
+                    <td class="px-3 py-2 text-center">
+                        <select onchange="updateTableData('actionChecklist', ${row.id}, 'status', event)" class="data-input ${row.status === 'Done' ? 'bg-green-100 text-green-800' : row.status === 'In Progress' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'}">
+                            ${statusOptions(row.status)}
+                        </select>
+                    </td>
+                    <td class="px-3 py-2 text-center"><button onclick="deleteRow('actionChecklist', ${row.id})" class="text-red-600 hover:text-red-800 transition-colors">Delete</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function renderRecoveryTasks() {
+            const container = document.getElementById('recoveryTasksContainer');
+            container.innerHTML = ''; // Clear previous content
+
+            // Group recovery steps by Critical Service ID
+            const servicesMap = new Map();
+            pscpData.criticalServices.forEach(service => {
+                servicesMap.set(service.id, { service: service.service, steps: [] });
+            });
+            pscpData.recoverySteps.forEach(step => {
+                if (servicesMap.has(step.serviceId)) {
+                    servicesMap.get(step.serviceId).steps.push(step);
+                }
+            });
+
+            servicesMap.forEach((data, serviceId) => {
+                const serviceBlock = document.createElement('div');
+                serviceBlock.className = 'p-5 border border-gray-200 rounded-lg bg-gray-50';
+                
+                let stepsHtml = data.steps.map(step => `
+                    <tr class="hover:bg-white transition-colors">
+                        <td class="px-3 py-2 w-10 text-center text-sm text-gray-500">${data.steps.findIndex(s => s.id === step.id) + 1}</td>
+                        <td class="px-3 py-2"><input type="text" value="${step.task}" onchange="updateTableData('recoverySteps', ${step.id}, 'task', event)" class="data-input"></td>
+                        <td class="px-3 py-2"><input type="text" value="${step.role}" onchange="updateTableData('recoverySteps', ${step.id}, 'role', event)" class="data-input"></td>
+                        <td class="px-3 py-2 whitespace-nowrap"><input type="text" value="${step.time}" onchange="updateTableData('recoverySteps', ${step.id}, 'time', event)" class="data-input"></td>
+                        <td class="px-3 py-2 text-center"><button onclick="deleteRecoveryStep('recoverySteps', ${step.id})" class="text-red-600 hover:text-red-800 transition-colors">Delete</button></td>
+                    </tr>
+                `).join('');
+                
+                serviceBlock.innerHTML = `
+                    <h4 class="text-lg font-semibold mb-3 text-gray-800">${data.service}</h4>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-100 sticky-header">
+                                <tr>
+                                    <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-10">Step #</th>
+                                    <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Task Description</th>
+                                    <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Responsible Team/Role</th>
+                                    <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">Estimated Time</th>
+                                    <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                ${stepsHtml}
+                            </tbody>
+                        </table>
+                    </div>
+                    <button onclick="addRecoveryStep(${serviceId})" class="mt-3 text-sm text-blue-600 hover:text-blue-800 transition-colors font-medium">+ Add Step</button>
+                `;
+                container.appendChild(serviceBlock);
+            });
+        }
+
+        function renderMaintenance() {
+            const body = document.getElementById('maintenanceBody');
+            body.innerHTML = pscpData.maintenance.map(row => `
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-3 py-2"><input type="text" value="${row.activity}" onchange="updateTableData('maintenance', ${row.id}, 'activity', event)" class="data-input"></td>
+                    <td class="px-3 py-2"><input type="text" value="${row.frequency}" onchange="updateTableData('maintenance', ${row.id}, 'frequency', event)" class="data-input"></td>
+                    <td class="px-3 py-2"><input type="text" value="${row.role}" onchange="updateTableData('maintenance', ${row.id}, 'role', event)" class="data-input"></td>
+                    <td class="px-3 py-2 whitespace-nowrap"><input type="date" value="${row.lastCompleted}" onchange="updateTableData('maintenance', ${row.id}, 'lastCompleted', event)" class="data-input"></td>
+                    <td class="px-3 py-2 text-center"><button onclick="deleteRow('maintenance', ${row.id})" class="text-red-600 hover:text-red-800 transition-colors">Delete</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function renderTesting() {
+            const body = document.getElementById('testingBody');
+            body.innerHTML = pscpData.testing.map(row => `
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-3 py-2 whitespace-nowrap"><input type="date" value="${row.date}" onchange="updateTableData('testing', ${row.id}, 'date', event)" class="data-input"></td>
+                    <td class="px-3 py-2"><input type="text" value="${row.type}" onchange="updateTableData('testing', ${row.id}, 'type', event)" class="data-input"></td>
+                    <td class="px-3 py-2"><input type="text" value="${row.objectives}" onchange="updateTableData('testing', ${row.id}, 'objectives', event)" class="data-input"></td>
+                    <td class="px-3 py-2"><textarea onchange="updateTableData('testing', ${row.id}, 'summary', event)" rows="2" class="data-input">${row.summary}</textarea></td>
+                    <td class="px-3 py-2 text-center"><button onclick="deleteRow('testing', ${row.id})" class="text-red-600 hover:text-red-800 transition-colors">Delete</button></td>
+                </tr>
+            `).join('');
+        }
+        
+        // Master Render Function
+        function renderAll() {
+            renderMetadata();
+            renderVersionHistory();
+            renderCmt();
+            renderPersonnel();
+            renderCriticalServices();
+            renderRiskAssessment();
+            renderAltSites();
+            renderVitalRecords();
+            renderActivationCriteria();
+            renderActionChecklist();
+            renderRecoveryTasks();
+            renderMaintenance();
+            renderTesting();
+        }
+
+
+        // --- UI Navigation ---
+        window.showSection = (sectionId) => {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+
+            // Remove active style from all tabs
+            document.querySelectorAll('.tab-item').forEach(tab => {
+                tab.classList.remove('border-green-600', 'text-green-600', 'active-tab');
+                tab.classList.add('border-transparent', 'text-gray-500');
+            });
+
+            // Show target section
+            document.getElementById(sectionId).classList.remove('hidden');
+
+            // Set active style on the corresponding tab
+            const activeTab = document.querySelector(`[onclick="showSection('${sectionId}')"]`);
+            if (activeTab) {
+                activeTab.classList.add('border-green-600', 'text-green-600', 'active-tab');
+                activeTab.classList.remove('border-transparent', 'text-gray-500');
+            }
+        };
+
+        // Initial setup on load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if Firebase was successfully initialized and data is loading/ready
+            if (!userId) {
+                renderAll(); // Use default data immediately if auth is still pending or failed
+            }
+            window.showSection('control'); // Show the first tab by default
+        });
+
+        // Expose functions globally for HTML inline handlers
+        window.updateMetadata = updateMetadata;
+        window.updateTableData = updateTableData;
+        window.deleteRow = deleteRow;
+
+    </script>
+</body>
+</html>
