@@ -6,6 +6,8 @@
     <title>PSCP Workbench - Public Service Continuity Plan</title>
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load html2pdf for PDF export functionality -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <!-- Use Inter font family -->
     <style>
         :root {
@@ -66,6 +68,14 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
             border: 1px solid #e5e7eb;
         }
+        
+        /* Custom button styling */
+        .btn-primary {
+            @apply bg-emerald-500 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-emerald-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50;
+        }
+        .btn-secondary {
+            @apply bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors;
+        }
     </style>
     <!-- Inter Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -74,8 +84,28 @@
     <!-- Header/Title Section -->
     <header class="bg-white shadow-md sticky top-0 z-20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row justify-between items-start md:items-center">
-            <h1 class="text-3xl font-bold text-gray-900">PSCP Workbench</h1>
-            <p class="text-sm text-gray-500 mt-1 md:mt-0">Public Service Continuity Plan (PWA Format)</p>
+            <div class="flex flex-col">
+                <h1 class="text-3xl font-bold text-gray-900">PSCP Workbench</h1>
+                <p class="text-sm text-gray-500 mt-1">Public Service Continuity Plan (PWA Format)</p>
+            </div>
+            
+            <div class="flex items-center space-x-3 mt-4 md:mt-0">
+                <!-- Save Status Indicator -->
+                <div id="save-status" class="text-sm font-medium text-gray-500 flex items-center">
+                    <svg id="save-icon" class="w-5 h-5 mr-1 text-emerald-500 animate-pulse hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-7.618 1.04A12.023 12.023 0 002 12c0 3.042 1.135 5.824 3.018 7.955L12 22.091l6.982-3.805C20.865 17.824 22 15.042 22 12c0-3.379-.81-6.196-2.382-7.016z"></path></svg>
+                    <span id="save-message">Initializing...</span>
+                </div>
+
+                <!-- Export Buttons -->
+                <button onclick="exportToPDF()" class="btn-primary flex items-center">
+                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    Export PDF
+                </button>
+                <button onclick="exportToMarkdown()" class="btn-secondary flex items-center">
+                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    Export Text
+                </button>
+            </div>
         </div>
     </header>
 
@@ -107,7 +137,7 @@
         </nav>
 
         <!-- Dynamic Content Sections -->
-        <div class="bg-white pscp-card p-6 md:p-10 rounded-lg shadow-lg">
+        <div id="pscp-document-content" class="bg-white pscp-card p-6 md:p-10 rounded-lg shadow-lg">
             
             <!-- SECTION 1: Document Control and Approval -->
             <section id="control" class="content-section">
@@ -151,7 +181,7 @@
                             <!-- Rows loaded by JS -->
                         </tbody>
                     </table>
-                    <button onclick="addVersionHistoryRow()" class="mt-4 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-300 transition-colors font-medium">Add Version Entry</button>
+                    <button onclick="addVersionHistoryRow()" class="mt-4 btn-secondary text-sm">Add Version Entry</button>
                 </div>
             </section>
 
@@ -175,7 +205,7 @@
                             <!-- Rows loaded by JS -->
                         </tbody>
                     </table>
-                    <button onclick="addCmtRow()" class="mt-4 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-300 transition-colors font-medium">Add CMT Role</button>
+                    <button onclick="addCmtRow()" class="mt-4 btn-secondary text-sm">Add CMT Role</button>
                 </div>
 
                 <h3 class="text-xl font-medium text-gray-700 mb-4">2.2. PSCP Team & Core Personnel</h3>
@@ -194,7 +224,7 @@
                             <!-- Rows loaded by JS -->
                         </tbody>
                     </table>
-                    <button onclick="addPersonnelRow()" class="mt-4 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-300 transition-colors font-medium">Add Core Personnel</button>
+                    <button onclick="addPersonnelRow()" class="mt-4 btn-secondary text-sm">Add Core Personnel</button>
                 </div>
             </section>
             
@@ -219,7 +249,7 @@
                             <!-- Rows loaded by JS -->
                         </tbody>
                     </table>
-                    <button onclick="addServiceRow()" class="mt-4 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-300 transition-colors font-medium">Add Critical Service</button>
+                    <button onclick="addServiceRow()" class="mt-4 btn-secondary text-sm">Add Critical Service</button>
                 </div>
 
                 <h3 class="text-xl font-medium text-gray-700 mb-4">3.2. Hazard and Risk Assessment</h3>
@@ -238,7 +268,7 @@
                             <!-- Rows loaded by JS -->
                         </tbody>
                     </table>
-                    <button onclick="addRiskRow()" class="mt-4 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-300 transition-colors font-medium">Add Hazard/Threat</button>
+                    <button onclick="addRiskRow()" class="mt-4 btn-secondary text-sm">Add Hazard/Threat</button>
                 </div>
             </section>
             
@@ -262,7 +292,7 @@
                             <!-- Rows loaded by JS -->
                         </tbody>
                     </table>
-                    <button onclick="addAltSiteRow()" class="mt-4 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-300 transition-colors font-medium">Add Alternate Site</button>
+                    <button onclick="addAltSiteRow()" class="mt-4 btn-secondary text-sm">Add Alternate Site</button>
                 </div>
                 
                 <h3 class="text-xl font-medium text-gray-700 mb-4">4.2. Vital Records and Data Management</h3>
@@ -281,7 +311,7 @@
                             <!-- Rows loaded by JS -->
                         </tbody>
                     </table>
-                    <button onclick="addVitalRecordRow()" class="mt-4 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-300 transition-colors font-medium">Add Vital Record</button>
+                    <button onclick="addVitalRecordRow()" class="mt-4 btn-secondary text-sm">Add Vital Record</button>
                 </div>
             </section>
             
@@ -305,7 +335,7 @@
                             <!-- Rows loaded by JS -->
                         </tbody>
                     </table>
-                    <button onclick="addCriteriaRow()" class="mt-4 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-300 transition-colors font-medium">Add Activation Criteria</button>
+                    <button onclick="addCriteriaRow()" class="mt-4 btn-secondary text-sm">Add Activation Criteria</button>
                 </div>
                 
                 <h3 class="text-xl font-medium text-gray-700 mb-4">5.3. Immediate Action Checklist (First 4 Hours)</h3>
@@ -324,7 +354,7 @@
                             <!-- Rows loaded by JS -->
                         </tbody>
                     </table>
-                    <button onclick="addActionChecklistRow()" class="mt-4 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-300 transition-colors font-medium">Add Checklist Item</button>
+                    <button onclick="addActionChecklistRow()" class="mt-4 btn-secondary text-sm">Add Checklist Item</button>
                 </div>
 
                 <h3 class="text-xl font-medium text-gray-700 mb-4">5.4. Critical Service Recovery Tasks</h3>
@@ -354,7 +384,7 @@
                             <!-- Rows loaded by JS -->
                         </tbody>
                     </table>
-                    <button onclick="addMaintenanceRow()" class="mt-4 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-300 transition-colors font-medium">Add Maintenance Activity</button>
+                    <button onclick="addMaintenanceRow()" class="mt-4 btn-secondary text-sm">Add Maintenance Activity</button>
                 </div>
                 
                 <h3 class="text-xl font-medium text-gray-700 mb-4">6.3. Testing and Exercise Schedule</h3>
@@ -373,26 +403,17 @@
                             <!-- Rows loaded by JS -->
                         </tbody>
                     </table>
-                    <button onclick="addTestingRow()" class="mt-4 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-300 transition-colors font-medium">Add Testing Entry</button>
+                    <button onclick="addTestingRow()" class="mt-4 btn-secondary text-sm">Add Testing Entry</button>
                 </div>
-                
-                <!-- Section 7 (Appendices) is covered by data loading in the JS for a more centralized view, but the sections can be added here if they were more than simple tables -->
             </section>
         </div>
     </div>
 
-    <!-- Footer for general info -->
-    <footer class="bg-gray-100 mt-8 py-4">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-gray-500">
-            <p>&copy; <span id="currentYear"></span> [Insert Organization Name]. All Rights Reserved. This plan is confidential and for internal use only.</p>
-        </div>
-    </footer>
-
-    <!-- Firebase SDK Imports -->
+    <!-- Firebase SDK Imports and Core JS Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, collection, query, orderBy, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
         // --- Global Variables (Canvas Environment) ---
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'pscp-workbench-default';
@@ -405,6 +426,7 @@
         let pscpDataRef;
 
         // --- Data Structure Initialization ---
+        // (Initial structure retained from previous version for continuity)
         let pscpData = {
             metadata: {
                 orgName: "[Insert Name of LGU/Agency]",
@@ -466,46 +488,75 @@
             }
         };
 
+        // --- UI Status Updates ---
+        const saveStatus = document.getElementById('save-status');
+        const saveMessage = document.getElementById('save-message');
+        const saveIcon = document.getElementById('save-icon');
+
+        function setStatus(message, type = 'saving') {
+            saveMessage.textContent = message;
+            saveIcon.classList.remove('hidden', 'text-red-500', 'text-emerald-500', 'animate-pulse');
+
+            if (type === 'saved') {
+                saveIcon.classList.add('text-emerald-500');
+                saveIcon.classList.remove('animate-pulse');
+            } else if (type === 'saving') {
+                saveIcon.classList.add('text-emerald-500', 'animate-pulse');
+            } else if (type === 'error') {
+                saveIcon.classList.add('text-red-500');
+                saveIcon.classList.remove('animate-pulse');
+            } else if (type === 'ready') {
+                 saveIcon.classList.add('text-gray-400');
+                 saveIcon.classList.remove('animate-pulse');
+            }
+        }
+
         // --- Firebase Initialization and Authentication ---
         if (firebaseConfig) {
             try {
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
-                // setLogLevel('debug'); // Enable for detailed logging
+                
+                setStatus("Authenticating...");
 
-                if (initialAuthToken) {
-                    signInWithCustomToken(auth, initialAuthToken).catch(error => {
-                        console.error("Firebase Custom Auth failed:", error);
-                        signInAnonymously(auth); // Fallback to anonymous
-                    });
-                } else {
-                    signInAnonymously(auth); // Sign in anonymously if no token
-                }
+                const signInUser = async () => {
+                    if (initialAuthToken) {
+                        try {
+                            await signInWithCustomToken(auth, initialAuthToken);
+                        } catch (error) {
+                            console.error("Firebase Custom Auth failed:", error);
+                            await signInAnonymously(auth); 
+                        }
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                };
+
+                signInUser();
 
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
                         userId = user.uid;
                         // Public data path: /artifacts/{appId}/public/data/{collection_name}/
                         pscpDataRef = doc(db, 'artifacts', appId, 'public', 'data', 'pscpData', 'document');
-                        
-                        // Start real-time listener after authentication
+                        setStatus("Ready. Loading data...");
                         setupRealtimeListener();
                     } else {
-                        // User is signed out or anonymous sign-in failed
+                        setStatus("Not signed in. Using default data.", 'error');
                         console.log("No user signed in. Using default data.");
-                        // Still render tables with default data
                         renderAll(); 
                     }
                 });
 
             } catch (error) {
                 console.error("Firebase initialization failed:", error);
-                // Fallback to render with default data if Firebase fails
+                setStatus("Error: Initialization failed.", 'error');
                 renderAll(); 
             }
         } else {
             console.warn("Firebase configuration not provided. Using default data.");
+            setStatus("No Cloud Save. Using local mode.", 'ready');
             renderAll();
         }
 
@@ -513,24 +564,19 @@
             if (pscpDataRef && userId) {
                 onSnapshot(pscpDataRef, (doc) => {
                     if (doc.exists()) {
-                        // Load and render data from Firestore
                         const data = doc.data();
-                        // Check for mandatory fields before merging/overwriting
                         if (data.metadata && data.versionHistory) {
                             pscpData = data;
                             renderAll();
-                        } else {
-                            console.warn("Firestore document found but appears incomplete. Using cached data.");
-                            renderAll();
-                            saveData(); // Attempt to save the current default data structure
+                            setStatus("Loaded from Cloud.", 'saved');
                         }
                     } else {
-                        // Document doesn't exist, save default data to Firestore
-                        console.log("No PSCP document found in Firestore. Creating new one.");
+                        console.log("No PSCP document found. Creating new one.");
                         saveData(); 
                     }
                 }, (error) => {
                     console.error("Error setting up Firestore listener:", error);
+                    setStatus("Error connecting to database.", 'error');
                 });
             }
         }
@@ -538,13 +584,17 @@
         // --- Data Manipulation and Persistence ---
         function saveData() {
             if (pscpDataRef && userId) {
-                // IMPORTANT: Use JSON.stringify/JSON.parse for complex nested structures if needed, 
-                // but for this simple structure, direct save is fine.
-                setDoc(pscpDataRef, pscpData).catch(error => {
+                setStatus("Saving...", 'saving');
+                setDoc(pscpDataRef, pscpData).then(() => {
+                    setStatus("All changes saved.", 'saved');
+                }).catch(error => {
                     console.error("Error writing document to Firestore:", error);
+                    setStatus("Save Error!", 'error');
                 });
             } else {
-                console.warn("Cannot save data: Firebase not initialized or user not authenticated.");
+                setStatus("No Cloud Save (Local Mode).", 'ready');
+                // Even without cloud save, render to reflect local changes immediately
+                renderAll(); 
             }
         }
 
@@ -576,7 +626,7 @@
             saveData();
         }
 
-        // --- Row Addition Functions (Using the addRow helper) ---
+        // --- Row Addition Functions (Exposed to window) ---
         window.addVersionHistoryRow = () => addRow('versionHistory', { version: '', date: new Date().toISOString().slice(0, 10), description: '', author: '' });
         window.addCmtRow = () => addRow('cmt', { role: '[New Role]', responsibility: '[Responsibility]', primaryContact: '', secondaryContact: '' });
         window.addPersonnelRow = () => addRow('personnel', { name: '', role: '', dept: '', contact: '' });
@@ -589,7 +639,6 @@
         window.addMaintenanceRow = () => addRow('maintenance', { activity: '', frequency: 'Annually', role: '', lastCompleted: '' });
         window.addTestingRow = () => addRow('testing', { date: '', type: 'Tabletop', objectives: '', summary: '' });
 
-        // Recovery Step addition is slightly more complex as it needs a service ID
         window.addRecoveryStep = (serviceId) => {
              const newId = pscpData.nextIds['recoverySteps'] || 1;
              pscpData.recoverySteps.push({ id: newId, serviceId: serviceId, task: '', role: '', time: '' });
@@ -600,18 +649,13 @@
         window.deleteRow = deleteRow; // Expose to window for generic table rows
 
         // --- Rendering Functions (Populate HTML) ---
-
+        // (Rendering functions omitted here for brevity, but they remain identical to the previous version and are essential for functionality)
         function renderMetadata() {
-            // Document Control
             document.getElementById('orgName').value = pscpData.metadata.orgName;
             document.getElementById('docVersion').value = pscpData.metadata.docVersion;
             document.getElementById('nextReviewDate').value = pscpData.metadata.nextReviewDate;
             document.getElementById('planOwner').value = pscpData.metadata.planOwner;
-            // The footer is also updated
-            document.getElementById('currentYear').textContent = new Date().getFullYear();
-            document.querySelector('footer p').innerHTML = document.querySelector('footer p').innerHTML.replace(/\[Insert Organization Name\]/g, pscpData.metadata.orgName);
 
-            // Attach listeners to update metadata directly on change
             document.getElementById('orgName').onchange = (e) => updateMetadata('orgName', 'orgName');
             document.getElementById('docVersion').onchange = (e) => updateMetadata('docVersion', 'docVersion');
             document.getElementById('nextReviewDate').onchange = (e) => updateMetadata('nextReviewDate', 'nextReviewDate');
@@ -753,9 +797,8 @@
 
         function renderRecoveryTasks() {
             const container = document.getElementById('recoveryTasksContainer');
-            container.innerHTML = ''; // Clear previous content
+            container.innerHTML = ''; 
 
-            // Group recovery steps by Critical Service ID
             const servicesMap = new Map();
             pscpData.criticalServices.forEach(service => {
                 servicesMap.set(service.id, { service: service.service, steps: [] });
@@ -770,13 +813,13 @@
                 const serviceBlock = document.createElement('div');
                 serviceBlock.className = 'p-5 border border-gray-200 rounded-lg bg-gray-50';
                 
-                let stepsHtml = data.steps.map(step => `
+                let stepsHtml = data.steps.map((step, index) => `
                     <tr class="hover:bg-white transition-colors">
-                        <td class="px-3 py-2 w-10 text-center text-sm text-gray-500">${data.steps.findIndex(s => s.id === step.id) + 1}</td>
+                        <td class="px-3 py-2 w-10 text-center text-sm text-gray-500">${index + 1}</td>
                         <td class="px-3 py-2"><input type="text" value="${step.task}" onchange="updateTableData('recoverySteps', ${step.id}, 'task', event)" class="data-input"></td>
                         <td class="px-3 py-2"><input type="text" value="${step.role}" onchange="updateTableData('recoverySteps', ${step.id}, 'role', event)" class="data-input"></td>
                         <td class="px-3 py-2 whitespace-nowrap"><input type="text" value="${step.time}" onchange="updateTableData('recoverySteps', ${step.id}, 'time', event)" class="data-input"></td>
-                        <td class="px-3 py-2 text-center"><button onclick="deleteRecoveryStep('recoverySteps', ${step.id})" class="text-red-600 hover:text-red-800 transition-colors">Delete</button></td>
+                        <td class="px-3 py-2 text-center"><button onclick="deleteRecoveryStep(${step.id})" class="text-red-600 hover:text-red-800 transition-colors">Delete</button></td>
                     </tr>
                 `).join('');
                 
@@ -830,7 +873,6 @@
             `).join('');
         }
         
-        // Master Render Function
         function renderAll() {
             renderMetadata();
             renderVersionHistory();
@@ -872,13 +914,181 @@
             }
         };
 
+
+        // --- Export Functions ---
+        window.exportToPDF = () => {
+            const element = document.getElementById('pscp-document-content');
+            
+            // Temporarily make all sections visible for PDF generation
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('hidden');
+            });
+            
+            const pdfOptions = {
+                margin: 10,
+                filename: `${pscpData.metadata.orgName.replace(/ /g, '_')}_PSCP_v${pscpData.metadata.docVersion.split(' ')[0]}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            setStatus("Generating PDF...", 'saving');
+
+            html2pdf().from(element).set(pdfOptions).save().then(() => {
+                 setStatus("PDF generated successfully.", 'saved');
+                 // Restore visibility to the currently active tab after generation
+                 const activeTab = document.querySelector('.active-tab');
+                 if (activeTab) {
+                     const activeSectionId = activeTab.getAttribute('onclick').match(/'([^']+)'/)[1];
+                     window.showSection(activeSectionId);
+                 } else {
+                     window.showSection('control');
+                 }
+            }).catch(error => {
+                console.error("PDF export failed:", error);
+                setStatus("PDF export failed!", 'error');
+                
+                 // Attempt to restore visibility even on error
+                 const activeTab = document.querySelector('.active-tab');
+                 if (activeTab) {
+                     const activeSectionId = activeTab.getAttribute('onclick').match(/'([^']+)'/)[1];
+                     window.showSection(activeSectionId);
+                 } else {
+                     window.showSection('control');
+                 }
+            });
+        };
+        
+        window.exportToMarkdown = () => {
+            const orgName = pscpData.metadata.orgName;
+            const version = pscpData.metadata.docVersion.split(' ')[0];
+            let mdContent = `# Public Service Continuity Plan: ${orgName}\n\n`;
+            mdContent += `**Version:** ${pscpData.metadata.docVersion}\n`;
+            mdContent += `**Owner:** ${pscpData.metadata.planOwner}\n`;
+            mdContent += `**Next Review:** ${pscpData.metadata.nextReviewDate}\n\n`;
+            mdContent += '***\n\n';
+
+            // 1. Document Control
+            mdContent += '## 1. Document Control and Approval\n\n';
+            mdContent += '### Version History\n';
+            mdContent += '| Version | Date | Description | Author |\n';
+            mdContent += '| :--- | :--- | :--- | :--- |\n';
+            pscpData.versionHistory.forEach(row => {
+                mdContent += `| ${row.version} | ${row.date} | ${row.description} | ${row.author} |\n`;
+            });
+            mdContent += '\n';
+
+            // 2. Governance
+            mdContent += '## 2. PSCP Governance and Organization\n\n';
+            mdContent += '### Command and Control Structure (CMT)\n';
+            mdContent += '| Role | Responsibility | Primary Contact | Secondary Contact |\n';
+            mdContent += '| :--- | :--- | :--- | :--- |\n';
+            pscpData.cmt.forEach(row => {
+                mdContent += `| ${row.role} | ${row.responsibility} | ${row.primaryContact} | ${row.secondaryContact} |\n`;
+            });
+            mdContent += '\n';
+            
+            // (Continue for all other sections: BIA, Strategies, Procedures, Maintenance)
+            
+            // 3. BIA & Risk Assessment
+            mdContent += '## 3. BIA & Risk Assessment\n\n';
+            mdContent += '### Critical Public Services\n';
+            mdContent += '| Service | RTO | RPO | Required Resources |\n';
+            mdContent += '| :--- | :--- | :--- | :--- |\n';
+            pscpData.criticalServices.forEach(row => {
+                mdContent += `| ${row.service} | ${row.rto} | ${row.rpo} | ${row.resources} |\n`;
+            });
+            mdContent += '\n';
+            
+            mdContent += '### Hazard and Risk Assessment\n';
+            mdContent += '| Hazard | Likelihood | Impact | Mitigation Measures |\n';
+            mdContent += '| :--- | :--- | :--- | :--- |\n';
+            pscpData.riskAssessment.forEach(row => {
+                mdContent += `| ${row.hazard} | ${row.likelihood} | ${row.impact} | ${row.mitigation} |\n`;
+            });
+            mdContent += '\n';
+
+            // 4. Continuity Strategies
+            mdContent += '## 4. Continuity Strategies\n\n';
+            mdContent += '### Alternate Operating Sites\n';
+            mdContent += '| Location | Capacity | Key Facilities | Accessibility |\n';
+            mdContent += '| :--- | :--- | :--- | :--- |\n';
+            pscpData.altSites.forEach(row => {
+                mdContent += `| ${row.location} | ${row.capacity} | ${row.facilities} | ${row.accessibility} |\n`;
+            });
+            mdContent += '\n';
+
+            // 5. Activation, Response, and Recovery Procedures
+            mdContent += '## 5. Activation, Response, and Recovery Procedures\n\n';
+            mdContent += '### Incident Classification and Activation Criteria\n';
+            mdContent += '| Level | Impact | Authority | Immediate Action |\n';
+            mdContent += '| :--- | :--- | :--- | :--- |\n';
+            pscpData.activationCriteria.forEach(row => {
+                mdContent += `| ${row.level} | ${row.impact} | ${row.authority} | ${row.action} |\n`;
+            });
+            mdContent += '\n';
+            
+            mdContent += '### Immediate Action Checklist (First 4 Hours)\n';
+            mdContent += '| Task | Responsible Role | Status | Notes |\n';
+            mdContent += '| :--- | :--- | :--- | :--- |\n';
+            pscpData.actionChecklist.forEach(row => {
+                mdContent += `| ${row.task} | ${row.role} | **${row.status}** | ${row.notes} |\n`;
+            });
+            mdContent += '\n';
+
+            // Recovery Tasks
+            mdContent += '### Critical Service Recovery Tasks\n\n';
+            pscpData.criticalServices.forEach(service => {
+                const steps = pscpData.recoverySteps.filter(s => s.serviceId === service.id);
+                mdContent += `#### Service: ${service.service} (RTO: ${service.rto})\n\n`;
+                if (steps.length > 0) {
+                    steps.forEach((step, index) => {
+                        mdContent += `${index + 1}. ${step.task} (Role: ${step.role}, Time: ${step.time})\n`;
+                    });
+                } else {
+                    mdContent += '*No detailed recovery steps defined.*\n';
+                }
+                mdContent += '\n';
+            });
+            
+            // 6. Maintenance, Training, and Testing
+            mdContent += '## 6. Plan Maintenance, Training, and Testing\n\n';
+            mdContent += '### Review and Maintenance Schedule\n';
+            mdContent += '| Activity | Frequency | Responsible Role | Last Completed |\n';
+            mdContent += '| :--- | :--- | :--- | :--- |\n';
+            pscpData.maintenance.forEach(row => {
+                mdContent += `| ${row.activity} | ${row.frequency} | ${row.role} | ${row.lastCompleted} |\n`;
+            });
+            mdContent += '\n';
+            
+            mdContent += '### Testing and Exercise Schedule\n';
+            mdContent += '| Date | Type | Objectives | Summary |\n';
+            mdContent += '| :--- | :--- | :--- | :--- |\n';
+            pscpData.testing.forEach(row => {
+                mdContent += `| ${row.date} | ${row.type} | ${row.objectives} | ${row.summary} |\n`;
+            });
+            mdContent += '\n';
+
+            // Create a Blob and initiate download
+            const blob = new Blob([mdContent], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${orgName.replace(/ /g, '_')}_PSCP_v${version}.md`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            setStatus("Text/Markdown file downloaded.", 'saved');
+        };
+
         // Initial setup on load
         document.addEventListener('DOMContentLoaded', () => {
-            // Check if Firebase was successfully initialized and data is loading/ready
             if (!userId) {
-                renderAll(); // Use default data immediately if auth is still pending or failed
+                renderAll(); 
             }
-            window.showSection('control'); // Show the first tab by default
+            window.showSection('control'); 
         });
 
         // Expose functions globally for HTML inline handlers
