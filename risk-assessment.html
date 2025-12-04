@@ -3,151 +3,299 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Integrated Risk Assessment</title>
+    <title>Integrated Risk Assessment Workbench (Command Center Style)</title>
     
     <!-- Google Fonts Imports -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Poppins:wght@600&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Poppins:wght@600&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS CDN (MUST LOAD FIRST) -->
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.js"></script>
     
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
 
-    <!-- Tailwind Config for Custom Colors (Command Center Theme) - MUST RUN AFTER CDN LOAD -->
+    <!-- Tailwind Config for Custom Colors and Inter Font -->
     <script>
-        // Fix: Ensure tailwind.config runs after the tailwind object is defined by the CDN.
-        // We also use an IIFE to ensure proper scope.
         (function() {
             if (typeof tailwind !== 'undefined') {
                 tailwind.config = {
                     theme: {
                         extend: {
+                            fontFamily: {
+                                sans: ['Inter', 'sans-serif'],
+                                poppins: ['Poppins', 'sans-serif'],
+                                roboto: ['Roboto Condensed', 'sans-serif'],
+                            },
                             colors: {
-                                primary: '#00f7ff', // Cyan/Aqua (Command Center Accent)
-                                secondary: '#e5e7eb', // Light Gray (Text Color)
-                                danger: '#ef4444', // Red (High Risk)
-                                warning: '#f97316', // Orange (Medium Risk)
-                                safe: '#10b981', // Emerald Green (Mitigation Success)
-                                context: '#1f2937', // Dark Slate Gray (Panel Background)
-                                background: '#0a0a0a', // Nearly Black
+                                primary: '#00f7ff',
+                                secondary: '#e5e7eb',
+                                danger: '#ef4444',
+                                warning: '#f97316',
+                                safe: '#10b981',
+                                context: '#111827',
+                                background: '#0f0f0f',
                             }
                         }
                     }
                 }
-            } else {
-                console.error("Tailwind CSS library not loaded. Cannot set config.");
             }
         })();
     </script>
 
     <style>
-        /* Custom Font Definitions */
-        .font-poppins { font-family: 'Poppins', sans-serif; font-weight: 600; }
-        .font-montserrat { font-family: 'Montserrat', sans-serif; }
-        .font-roboto { font-family: 'Roboto Condensed', sans-serif; }
-        
-        /* Global Body Font for general text and data */
+        /* Global Body Font and Background – improved contrast */
         body {
-            font-family: 'Roboto Condensed', sans-serif;
+            font-family: 'Inter', sans-serif;
+            background-color: #0f0f0f;
+            color: #e6e6e6;
+            background-image: radial-gradient(circle at 50% 10%, rgba(0, 247, 255, 0.03), transparent 70%);
+            margin: 0;
+            padding: 0;
         }
 
-        /* Custom Scrollbar */
+        /* --- High-Contrast Custom Scrollbar --- */
         ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #1f2937; /* Dark track */
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #00f7ff; /* Cyan thumb */
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #00d7dd; 
+            width: 10px;
         }
 
-        /* Chart Container Specifics */
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #4b5563;
+            border-radius: 5px;
+            border: 2px solid #1a1a1a;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+        }
+
+        /* --- Chart Container Specifics (MANDATORY) --- */
         .chart-container {
             position: relative;
             width: 100%;
-            max-width: 900px;
+            max-width: 800px;
             height: 400px;
             max-height: 500px;
             margin-left: auto;
             margin-right: auto;
         }
-        
+
         @media (max-width: 768px) {
             .chart-container {
                 height: 300px;
             }
         }
 
-        /* Utility for Highlighting Risk Levels (Adjusted for Dark Mode) */
-        .risk-high { background-color: #991b1b; color: #fca5a5; font-weight: 700; } 
-        .risk-medium { background-color: #9a3412; color: #fdba74; font-weight: 700; }
-        .risk-low { background-color: #065f46; color: #a7f3d0; font-weight: 700; }
-        .risk-vlow { background-color: #374151; color: #d1d5db; font-weight: 700; }
+        /* --- Interactive Card Hover Effects (MANDATORY) --- */
+        .interactive-card {
+            background-color: #171717;
+            border: 1px solid #374151;
+            transition: all 0.3s ease;
+        }
 
-        /* Custom Input/Table Styling for Dark Theme & Roboto Condensed */
-        input[type="text"], textarea, select {
+        .interactive-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 247, 255, 0.15);
+            border-color: #00f7ff;
+        }
+
+        .interactive-card:focus-within {
+            outline: 2px solid #00f7ff;
+            outline-offset: 2px;
+        }
+
+        /* --- Timeline Connector Lines (MANDATORY) --- */
+        .timeline-line::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 2px;
+            background-color: #4b5563;
+            z-index: 0;
+            transform: translateX(-50%);
+        }
+
+        /* High-Contrast Risk Level Tags */
+        .risk-high { 
+            background-color: #7f1d1d; 
+            color: #fecaca; 
+            font-weight: 700; 
+            padding: 4px 8px; 
+            border-radius: 4px; 
+            border: 1px solid #b91c1c; 
+        } 
+        .risk-medium { 
+            background-color: #7c2d12; 
+            color: #fed7aa; 
+            font-weight: 700; 
+            padding: 4px 8px; 
+            border-radius: 4px; 
+            border: 1px solid #c2410c; 
+        }
+        .risk-low { 
+            background-color: #042f2e; 
+            color: #ccfbf1; 
+            font-weight: 700; 
+            padding: 4px 8px; 
+            border-radius: 4px; 
+            border: 1px solid #0d9488; 
+        }
+        .risk-vlow { 
+            background-color: #1e293b; 
+            color: #e2e8f0; 
+            font-weight: 700; 
+            padding: 4px 8px; 
+            border-radius: 4px; 
+            border: 1px solid #334155; 
+        }
+
+        /* Form Controls */
+        input[type="text"],
+        textarea,
+        select {
             border-radius: 0.375rem;
-            border-color: #00f7ff40; 
+            border: 1px solid #374151;
             padding: 0.5rem 0.75rem;
             font-size: 0.875rem;
             width: 100%;
-            background-color: #111827; 
-            color: #e5e7eb;
-            transition: border-color 0.2s;
-            font-family: 'Roboto Condensed', sans-serif; /* Applied Font */
-        }
-        input[type="text"]:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: #00f7ff;
-            box-shadow: 0 0 0 1px #00f7ff;
+            background-color: #111827;
+            color: #f1f5f9;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            font-family: 'Inter', sans-serif;
         }
 
-        /* Main table hover effect */
+        input[type="text"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #00f7ff;
+            box-shadow: 0 0 0 2px rgba(0, 247, 255, 0.4);
+        }
+
+        /* Table Rows */
+        #risk-table tbody tr {
+            background-color: #111827;
+            border-bottom: 1px solid #1f2937;
+        }
+
         #risk-table tbody tr:hover {
-            background-color: #1f2937; 
+            background-color: #1e293b;
+        }
+
+        /* Headers */
+        h3 {
+            color: #00f7ff;
+            text-shadow: 0 0 8px rgba(0, 247, 255, 0.2);
+        }
+
+        /* Sidebar */
+        #sidebar {
+            background-color: #111827 !important;
+            border-right: 1px solid #374151;
+        }
+
+        .nav-item {
+            color: #d1d5db;
+        }
+
+        .nav-item:hover,
+        .nav-item.active-nav {
+            color: #f9fafb;
+            background-color: #1f2937;
+            border-left-color: #00f7ff !important;
+        }
+
+        /* Text colors for readability */
+        .text-gray-400 {
+            color: #9ca3af !important;
+        }
+
+        .text-gray-200 {
+            color: #e5e7eb !important;
+        }
+
+        /* Focus visibility */
+        button:focus,
+        .nav-item:focus {
+            outline: 2px solid #00f7ff;
+            outline-offset: 2px;
+        }
+
+        /* Section Transition */
+        .content-section {
+            opacity: 1;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .content-section.hidden {
+            display: none;
+            opacity: 0;
+        }
+
+        /* Sidebar overlay for mobile */
+        .backdrop-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(15, 15, 15, 0.85);
+            z-index: 30;
+            transition: opacity 0.3s;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .backdrop-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
         }
     </style>
 </head>
-<body class="bg-gray-900 text-gray-200 antialiased h-screen flex overflow-hidden font-roboto">
+<body class="text-gray-200 antialiased h-screen flex overflow-hidden">
+
+    <!-- Backdrop for Mobile Sidebar -->
+    <div id="backdrop" class="backdrop-overlay" onclick="toggleMobileMenu()"></div>
 
     <!-- Mobile Menu Button -->
-    <button id="mobile-menu-btn" class="md:hidden fixed top-4 right-4 z-50 bg-gray-700 text-primary p-2 rounded shadow-lg border border-primary font-montserrat">
-        ☰
+    <button id="mobile-menu-btn" class="md:hidden fixed top-4 right-4 z-50 bg-context text-primary p-3 rounded-full shadow-lg border-2 border-primary/50 hover:bg-gray-700 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
     </button>
 
-    <!-- Sidebar Navigation -->
-    <aside id="sidebar" class="bg-gray-800 text-gray-100 w-64 flex-shrink-0 flex flex-col transition-transform transform -translate-x-full md:translate-x-0 fixed md:relative h-full z-40 border-r border-primary/50 font-montserrat">
-        <div class="p-6 border-b border-primary/50 bg-gray-900">
-            <h1 class="text-xl font-poppins tracking-widest text-primary">PSCP <span class="text-white">RISK CMD</span></h1>
-            <p class="text-xs text-gray-400 mt-1 font-roboto">ISO 31000 Workbench</p>
+    <!-- Sidebar Navigation (Fixed on Desktop) -->
+    <aside id="sidebar" class="bg-gray-800 text-gray-100 w-64 flex-shrink-0 flex flex-col transition-transform duration-300 transform -translate-x-full md:translate-x-0 fixed md:sticky top-0 h-full z-40 border-r border-primary/50 shadow-2xl shadow-primary/10">
+        <div class="p-6 border-b border-primary/50 bg-gray-900 shadow-xl">
+            <h1 class="text-2xl font-poppins tracking-widest text-primary">PSCP <span class="text-white">RISK CMD</span></h1>
+            <p class="text-xs text-gray-400 mt-1 font-sans">ISO 31000 Workbench</p>
         </div>
         
         <nav class="flex-1 overflow-y-auto py-4">
             <ul class="space-y-1">
                 <li>
-                    <button onclick="navTo('context')" class="nav-item w-full text-left px-6 py-3 hover:bg-gray-700 transition-colors border-l-4 border-primary/0 active-nav bg-gray-700 border-l-4 border-primary">
-                        <span class="mr-2 text-primary">01</span> Context Establishment
+                    <button onclick="navTo('context')" class="nav-item w-full text-left px-6 py-3 flex items-center gap-3 hover:bg-gray-700 transition-colors border-l-4 border-primary/0 active-nav bg-gray-700 border-l-4 border-primary rounded-r-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary lucide lucide-git-branch"><line x1="6" x2="6" y1="3" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9c-3.88 0-7.35 1.72-9.6 4.34"/></svg>
+                        <span class="font-semibold text-sm">Context Establishment</span>
                     </button>
                 </li>
                 <li>
-                    <button onclick="navTo('assessment')" class="nav-item w-full text-left px-6 py-3 hover:bg-gray-700 transition-colors border-l-4 border-primary/0" id="nav-assessment">
-                        <span class="mr-2 text-primary">02</span> Risk Assessment
+                    <button onclick="navTo('assessment')" class="nav-item w-full text-left px-6 py-3 flex items-center gap-3 hover:bg-gray-700 transition-colors border-l-4 border-primary/0 rounded-r-full" id="nav-assessment">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary lucide lucide-bar-chart-3"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+                        <span class="font-semibold text-sm">Risk Assessment</span>
                     </button>
                 </li>
                 <li>
-                    <button onclick="navTo('evaluation')" class="nav-item w-full text-left px-6 py-3 hover:bg-gray-700 transition-colors border-l-4 border-primary/0" id="nav-evaluation">
-                        <span class="mr-2 text-primary">03</span> Control Evaluation
+                    <button onclick="navTo('evaluation')" class="nav-item w-full text-left px-6 py-3 flex items-center gap-3 hover:bg-gray-700 transition-colors border-l-4 border-primary/0 rounded-r-full" id="nav-evaluation">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary lucide lucide-shield-check"><path d="M20 13c0 5-8 7-8 7s-8-2-8-7V5l8-3 8 3z"/><path d="m9 12 2 2 4-4"/></svg>
+                        <span class="font-semibold text-sm">Control Evaluation</span>
                     </button>
                 </li>
                 <li>
-                    <button onclick="navTo('review')" class="nav-item w-full text-left px-6 py-3 hover:bg-gray-700 transition-colors border-l-4 border-primary/0" id="nav-review">
-                        <span class="mr-2 text-primary">04</span> Migration & Review
+                    <button onclick="navTo('review')" class="nav-item w-full text-left px-6 py-3 flex items-center gap-3 hover:bg-gray-700 transition-colors border-l-4 border-primary/0 rounded-r-full" id="nav-review">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary lucide lucide-line-chart"><path d="M3 3v18h18"/><path d="m18 12-6-6-4 4-3-3"/></svg>
+                        <span class="font-semibold text-sm">Migration & Review</span>
                     </button>
                 </li>
             </ul>
@@ -155,144 +303,159 @@
     </aside>
 
     <!-- Main Content Area -->
-    <main class="flex-1 overflow-y-auto relative w-full" id="main-scroll">
-        <div class="p-6 md:p-10 max-w-7xl mx-auto">
-            
-            <header class="mb-8 border-b border-primary/30 pb-4">
-                <h2 class="text-3xl font-poppins text-primary tracking-wide">Integrated Risk Assessment Workbench</h2>
-                <p class="mt-2 text-gray-400 max-w-4xl text-sm font-roboto">
-                    Executing the risk management process through a structured, ISO 31000-aligned approach, focusing on control effectiveness and risk migration.
-                </p>
-            </header>
+    <div class="flex-1 overflow-y-auto w-full md:ml-0">
+        <!-- Sticky Header -->
+        <header class="sticky top-0 z-10 bg-gray-900/90 backdrop-blur-sm border-b border-primary/30 p-4 md:p-6 shadow-xl">
+            <h2 class="text-3xl font-poppins text-primary tracking-wide">Integrated Risk Assessment Workbench</h2>
+            <p class="mt-1 text-gray-400 max-w-4xl text-sm font-sans">
+                ISO 31000-aligned approach focused on control effectiveness and risk migration.
+            </p>
+        </header>
 
-            <!-- SECTION 1: CONTEXT ESTABLISHMENT -->
-            <section id="context" class="content-section">
-                <h3 class="text-2xl font-poppins text-primary mb-4 pb-2">1. Context Establishment (Scope & Criteria)</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 bg-context p-6 rounded-lg shadow-xl border border-primary/50">
-                    
-                    <div>
-                        <h4 class="font-poppins text-lg mb-3 text-gray-100">A. Organizational Scope</h4>
-                        <p class="text-sm text-gray-400 mb-4 font-roboto">Define the boundaries and critical functions under assessment for continuity planning.</p>
-                        
-                        <label class="block text-sm font-montserrat text-gray-400 mb-1">Assessment Name</label>
-                        <input type="text" id="assessment-name" value="PSCP Q3 Risk Review" class="mb-4">
-                        
-                        <label class="block text-sm font-montserrat text-gray-400 mb-1">Critical Function Assessed</label>
-                        <textarea id="assessment-scope" rows="3" class="w-full">Emergency Response and Public Notification Services</textarea>
-                    </div>
+        <!-- Scrollable Main Body -->
+        <main class="relative w-full p-6 md:p-10" id="main-scroll">
+            <div class="max-w-7xl mx-auto">
+                
+                <!-- SECTION 1: CONTEXT ESTABLISHMENT -->
+                <section id="context" class="content-section">
+                    <h3 class="text-2xl font-poppins text-primary mb-6 pb-2 border-b border-primary/30">1. Context Establishment (Scope & Criteria)</h3>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-2 bg-context p-8 rounded-xl shadow-2xl border border-primary/50 interactive-card">
+                            <h4 class="font-poppins text-xl mb-4 text-gray-100 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary lucide lucide-compass"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg> Organizational Scope</h4>
+                            <p class="text-sm text-gray-400 mb-6 font-sans">Define the boundaries and critical functions under assessment for continuity planning.</p>
+                            
+                            <label class="block text-sm font-semibold text-gray-400 mb-1">Assessment Name</label>
+                            <input type="text" id="assessment-name" value="PSCP Q3 Risk Review" class="mb-6">
+                            
+                            <label class="block text-sm font-semibold text-gray-400 mb-1">Critical Function Assessed</label>
+                            <textarea id="assessment-scope" rows="4" class="w-full">Emergency Response and Public Notification Services, including IT Infrastructure and Key Personnel availability.</textarea>
 
-                    <div>
-                        <h4 class="font-poppins text-lg mb-3 text-gray-100">B. Risk Evaluation Criteria (5x5 Matrix)</h4>
-                        <p class="text-sm text-gray-400 mb-4 font-roboto">Inherent Risk Score = Likelihood (L) x Impact (I). Maximum Score: 25.</p>
-                        
-                        <!-- Risk Matrix Display -->
-                        <div class="grid grid-cols-6 gap-0.5 text-center text-xs font-roboto font-bold border border-primary/50 p-1 bg-gray-700">
-                            <div class="col-span-1 bg-gray-800 text-primary">L/I</div>
-                            <div class="col-span-1 bg-gray-800 text-primary">1 (Insig)</div>
-                            <div class="col-span-1 bg-gray-800 text-primary">2 (Minor)</div>
-                            <div class="col-span-1 bg-gray-800 text-primary">3 (Mod)</div>
-                            <div class="col-span-1 bg-gray-800 text-primary">4 (Major)</div>
-                            <div class="col-span-1 bg-gray-800 text-primary">5 (Catas)</div>
+                            <button onclick="navTo('assessment')" class="mt-8 bg-primary text-gray-900 px-6 py-3 rounded-xl font-poppins font-bold hover:bg-cyan-400 transition shadow-lg shadow-primary/30">
+                                Begin Assessment →
+                            </button>
+                        </div>
 
-                            <div class="col-span-1 bg-gray-800 text-primary">5 (Almost C.)</div>
-                            <div class="col-span-5 grid grid-cols-5 text-secondary">
-                                <div class="p-1 risk-medium">5</div>
-                                <div class="p-1 risk-high">10</div>
-                                <div class="p-1 risk-high">15</div>
-                                <div class="p-1 risk-high">20</div>
-                                <div class="p-1 risk-high">25</div>
-                            </div>
+                        <div class="bg-context p-6 rounded-xl shadow-2xl border border-warning/50 interactive-card">
+                            <h4 class="font-poppins text-xl mb-4 text-gray-100 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-warning lucide lucide-scaling"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"/><path d="M7 10h5v5"/></svg>Risk Evaluation Criteria (5x5)</h4>
+                            <p class="text-sm text-gray-400 mb-4 font-sans">Inherent Risk Score = Likelihood (L) x Impact (I). Max: 25.</p>
+                            
+                            <!-- Risk Matrix Display -->
+                            <div class="grid grid-cols-6 gap-px text-center text-xs font-semibold border-2 border-primary bg-gray-900 overflow-hidden rounded-lg">
+                                <div class="col-span-1 bg-gray-800 text-primary p-1 border-r border-primary">L/I</div>
+                                <div class="col-span-1 bg-gray-800 text-primary p-1">1 (Insig)</div>
+                                <div class="col-span-1 bg-gray-800 text-primary p-1">2 (Minor)</div>
+                                <div class="col-span-1 bg-gray-800 text-primary p-1">3 (Mod)</div>
+                                <div class="col-span-1 bg-gray-800 text-primary p-1">4 (Major)</div>
+                                <div class="col-span-1 bg-gray-800 text-primary p-1">5 (Catas)</div>
 
-                            <div class="col-span-1 bg-gray-800 text-primary">3 (Possible)</div>
-                            <div class="col-span-5 grid grid-cols-5 text-secondary">
-                                <div class="p-1 risk-low">3</div>
-                                <div class="p-1 risk-medium">6</div>
-                                <div class="p-1 risk-medium">9</div>
-                                <div class="p-1 risk-high">12</div>
-                                <div class="p-1 risk-high">15</div>
+                                <div class="col-span-1 bg-gray-800 text-primary p-1 border-r border-primary">5 (Almost C.)</div>
+                                <div class="col-span-5 grid grid-cols-5 text-secondary">
+                                    <div class="p-1 risk-medium">5</div>
+                                    <div class="p-1 risk-high">10</div>
+                                    <div class="p-1 risk-high">15</div>
+                                    <div class="p-1 risk-high">20</div>
+                                    <div class="p-1 risk-high">25</div>
+                                </div>
+
+                                <div class="col-span-1 bg-gray-800 text-primary p-1 border-r border-primary">3 (Possible)</div>
+                                <div class="col-span-5 grid grid-cols-5 text-secondary">
+                                    <div class="p-1 risk-low">3</div>
+                                    <div class="p-1 risk-medium">6</div>
+                                    <div class="p-1 risk-medium">9</div>
+                                    <div class="p-1 risk-high">12</div>
+                                    <div class="p-1 risk-high">15</div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <button onclick="navTo('assessment')" class="mt-6 bg-primary text-gray-900 px-6 py-2 rounded-lg font-montserrat font-bold hover:bg-cyan-400 transition shadow-md shadow-primary/50">Proceed to Assessment →</button>
-            </section>
+                </section>
 
-            <!-- SECTION 2 & 3: RISK ASSESSMENT & CONTROL EVALUATION (Combined Interactive Table) -->
-            <section id="assessment" class="content-section hidden">
-                <h3 class="text-2xl font-poppins text-primary mb-4 pb-2">2. Assessment & 3. Control Evaluation</h3>
-                <p class="text-gray-400 mb-6 text-sm font-roboto">
-                    Evaluate **Inherent Risk** (before controls) and then rate existing control effectiveness to calculate the **Residual Risk** (risk remaining).
-                </p>
-
-                <div class="bg-gray-800 p-4 rounded-lg shadow-xl border border-primary/50 overflow-x-auto">
-                    <table id="risk-table" class="min-w-full divide-y divide-gray-700 font-roboto">
-                        <thead class="bg-gray-700 text-xs uppercase tracking-wider text-primary">
-                            <tr>
-                                <th class="px-3 py-3 text-left">Hazard/Threat</th>
-                                <th class="px-3 py-3 text-left w-24">Inherent (L)</th>
-                                <th class="px-3 py-3 text-left w-24">Inherent (I)</th>
-                                <th class="px-3 py-3 text-center w-24">Inherent Score</th>
-                                <th class="px-3 py-3 text-left">Existing Controls / Treatment</th>
-                                <th class="px-3 py-3 text-center w-28">Control Eff. (1-5)</th>
-                                <th class="px-3 py-3 text-center w-24">Residual Score</th>
-                                <th class="px-3 py-3 text-center">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="risk-body" class="divide-y divide-gray-700 text-sm text-gray-300">
-                            <!-- Rows generated by JS -->
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="mt-6 p-4 bg-context rounded-lg border border-primary/30">
-                    <div class="flex gap-4 items-center">
-                        <input type="text" id="new-hazard" placeholder="Enter new hazard (e.g., Major Power Grid Failure)" class="flex-1">
-                        <button onclick="addRisk()" class="bg-primary text-gray-900 px-4 py-2 rounded-lg font-montserrat font-bold hover:bg-cyan-400 transition shrink-0 shadow-md shadow-primary/50">Add Risk</button>
-                    </div>
-                </div>
-
-                <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6 font-roboto">
-                    <div class="bg-gray-800 p-5 rounded-lg shadow-xl border-l-4 border-danger">
-                        <p class="text-xs uppercase text-gray-400 font-montserrat font-medium">Total High Inherent Risks (Score > 12)</p>
-                        <p id="high-risk-count" class="text-3xl font-poppins text-danger mt-1">0</p>
-                    </div>
-                    <div class="bg-gray-800 p-5 rounded-lg shadow-xl border-l-4 border-warning">
-                        <p class="text-xs uppercase text-gray-400 font-montserrat font-medium">Average Control Effectiveness</p>
-                        <p id="avg-control-eff" class="text-3xl font-poppins text-warning mt-1">0 / 5.0</p>
-                    </div>
-                    <div class="bg-gray-800 p-5 rounded-lg shadow-xl border-l-4 border-safe">
-                        <p class="text-xs uppercase text-gray-400 font-montserrat font-medium">Risks Migrated to Low (Residual Score < 6)</p>
-                        <p id="migrated-risk-count" class="text-3xl font-poppins text-safe mt-1">0</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- SECTION 4: MIGRATION & REVIEW -->
-            <section id="review" class="content-section hidden">
-                <h3 class="text-2xl font-poppins text-primary mb-4 pb-2">4. Risk Migration & Review</h3>
-                <p class="text-gray-400 mb-8 text-sm font-roboto">
-                    Review the risk migration from Inherent to Residual risk. Large gaps indicate effective controls, while small gaps highlight areas requiring new **Treatment Plans**.
-                </p>
-
-                <!-- Chart Container -->
-                <div class="chart-container bg-gray-800 p-6 rounded-xl shadow-xl border border-primary/50">
-                    <canvas id="migrationChart"></canvas>
-                </div>
-
-                <div class="mt-8 p-6 bg-context rounded-lg border border-primary/30 font-roboto">
-                    <h4 class="font-poppins text-lg mb-3 text-primary">Review & Next Steps</h4>
-                    <p class="text-sm text-gray-300 leading-relaxed">
-                        Focus immediate attention on risks where the **Residual Risk Score** remains above 9. These are the highest priority items for developing detailed, resource-allocated **Treatment Plans** to further mitigate continuity threats.
+                <!-- SECTION 2 & 3: RISK ASSESSMENT & CONTROL EVALUATION -->
+                <section id="assessment" class="content-section hidden">
+                    <h3 class="text-2xl font-poppins text-primary mb-6 pb-2 border-b border-primary/30">2. Assessment & 3. Control Evaluation</h3>
+                    <p class="text-gray-400 mb-6 text-sm font-sans">
+                        Evaluate <strong>Inherent Risk</strong> (before controls) and then rate existing control effectiveness to calculate the <strong>Residual Risk</strong> (risk remaining).
                     </p>
-                    <button onclick="window.migrationChartInstance.update()" class="mt-4 bg-gray-700 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-600 border border-primary/50 font-montserrat">Refresh Chart Data</button>
-                </div>
-            </section>
-        </div>
-    </main>
+
+                    <!-- KPI Cards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 font-sans mb-8">
+                        <div class="bg-context p-5 rounded-xl shadow-xl border-l-4 border-danger/80 hover:shadow-danger/20 transition-shadow interactive-card">
+                            <p class="text-xs uppercase text-gray-400 font-semibold flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-danger lucide lucide-alert-triangle"><path d="m21.73 18-9-15-9 15z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg> High Inherent Risks (Score > 12)</p>
+                            <p id="high-risk-count" class="text-4xl font-poppins text-danger mt-1">0</p>
+                        </div>
+                        <div class="bg-context p-5 rounded-xl shadow-xl border-l-4 border-warning/80 hover:shadow-warning/20 transition-shadow interactive-card">
+                            <p class="text-xs uppercase text-gray-400 font-semibold flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-warning lucide lucide-gauge"><path d="M20.1 9a9 9 0 1 0-16.2 0"/><path d="M12 14v4"/><path d="M10.5 4.5l3 3"/></svg> Average Control Effectiveness</p>
+                            <p id="avg-control-eff" class="text-4xl font-poppins text-warning mt-1">0 / 5.0</p>
+                        </div>
+                        <div class="bg-context p-5 rounded-xl shadow-xl border-l-4 border-safe/80 hover:shadow-safe/20 transition-shadow interactive-card">
+                            <p class="text-xs uppercase text-gray-400 font-semibold flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-safe lucide lucide-check-circle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg> Risks Migrated to Low (Residual Score < 6)</p>
+                            <p id="migrated-risk-count" class="text-4xl font-poppins text-safe mt-1">0</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Risk Table -->
+                    <div class="bg-context p-6 rounded-xl shadow-2xl border border-primary/50 overflow-x-auto mb-6">
+                        <table id="risk-table" class="min-w-full divide-y divide-gray-700 font-sans">
+                            <thead class="bg-gray-800 text-xs uppercase tracking-wider text-primary sticky top-0 z-5">
+                                <tr>
+                                    <th class="px-3 py-3 text-left">Hazard/Threat</th>
+                                    <th class="px-3 py-3 text-left w-24">L (1-5)</th>
+                                    <th class="px-3 py-3 text-left w-24">I (1-5)</th>
+                                    <th class="px-3 py-3 text-center w-24">Inherent</th>
+                                    <th class="px-3 py-3 text-left">Controls / Treatment</th>
+                                    <th class="px-3 py-3 text-center w-28">Eff (1-5)</th>
+                                    <th class="px-3 py-3 text-center w-24">Residual</th>
+                                    <th class="px-3 py-3 text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="risk-body" class="divide-y divide-gray-700 text-sm text-gray-300">
+                                <!-- Rows generated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Add Risk Section -->
+                    <div class="p-4 bg-gray-800 rounded-xl border border-primary/30 shadow-lg interactive-card">
+                        <div class="flex flex-col sm:flex-row gap-4 items-center">
+                            <input type="text" id="new-hazard" placeholder="Enter new hazard (e.g., Data Breach via API Misconfiguration)" class="flex-1">
+                            <button onclick="addRisk()" class="w-full sm:w-auto bg-primary text-gray-900 px-6 py-2 rounded-xl font-poppins font-bold hover:bg-cyan-400 transition shrink-0 shadow-md shadow-primary/50">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block mr-1 lucide lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                                Add Risk
+                            </button>
+                        </div>
+                    </div>
+                    <button onclick="navTo('review')" class="mt-6 bg-warning text-gray-900 px-6 py-3 rounded-xl font-poppins font-bold hover:bg-orange-400 transition shadow-lg shadow-warning/30 float-right">
+                        Review Migration →
+                    </button>
+                    <div class="clearfix"></div>
+                </section>
+
+                <!-- SECTION 4: MIGRATION & REVIEW -->
+                <section id="review" class="content-section hidden">
+                    <h3 class="text-2xl font-poppins text-primary mb-6 pb-2 border-b border-primary/30">4. Risk Migration & Review</h3>
+                    <p class="text-gray-400 mb-8 text-sm font-sans">
+                        Review the risk migration from Inherent to Residual risk (Top 5). Large gaps indicate effective controls, while small gaps highlight areas requiring new <strong>Treatment Plans</strong>.
+                    </p>
+
+                    <!-- Chart Container -->
+                    <div class="chart-container bg-context p-6 rounded-xl shadow-2xl border border-primary/50 interactive-card">
+                        <canvas id="migrationChart"></canvas>
+                    </div>
+
+                    <div class="mt-8 p-6 bg-context rounded-xl border border-primary/30 shadow-lg interactive-card">
+                        <h4 class="font-poppins text-xl mb-3 text-primary flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary lucide lucide-lightbulb"><path d="M15 14c.2-.58.2-1.2 0-2c-.2-.58-.5-1.07-1-1.42V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v6.58c-.5.35-.8 1.05-1 1.42-.2.58-.2 1.2 0 2a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2z"/><path d="M12 21h4"/></svg> Recommendations</h4>
+                        <p class="text-sm text-gray-300 leading-relaxed">
+                            Focus immediate attention on risks where the <strong>Residual Risk Score</strong> remains above 9. These are the highest priority items for developing detailed, resource-allocated <strong>Treatment Plans</strong> to further mitigate continuity threats.
+                        </p>
+                        <button onclick="window.migrationChartInstance.update()" class="mt-4 bg-gray-700 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-600 border border-primary/50 font-semibold transition">Refresh Chart Data</button>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
 
     <!-- JavaScript Logic -->
     <script>
-        // Data Structure for Risks
         let risks = [
             { 
                 id: 1, 
@@ -322,7 +485,6 @@
         let nextRiskId = 4;
         let migrationChartInstance;
         
-        // --- 1. Utility Functions ---
         function getRiskLevelClass(score) {
             if (score > 12) return 'risk-high';
             if (score > 6) return 'risk-medium';
@@ -333,33 +495,26 @@
         function calculateScore(likelihood, impact, effectiveness, type = 'inherent') {
             const inherent = likelihood * impact;
             if (type === 'inherent') return inherent;
-            
-            // Effectiveness rating (1=None, 5=Excellent) reduces the inherent risk
-            // Reduction Factor: 0% at Eff=1, 80% at Eff=5.
-            const reductionFactor = (effectiveness - 1) / 5; // Max 0.8
+            const reductionFactor = (effectiveness - 1) / 5;
             const residual = inherent * (1 - reductionFactor);
-
             return Math.round(residual);
         }
 
         function getDropdown(id, currentValue) {
             const options = [
-                { val: 1, text: '1 - Very Low' },
-                { val: 2, text: '2 - Low' },
-                { val: 3, text: '3 - Moderate' },
-                { val: 4, text: '4 - High' },
-                { val: 5, text: '5 - Very High' }
+                { val: 1, text: '1' },
+                { val: 2, text: '2' },
+                { val: 3, text: '3' },
+                { val: 4, text: '4' },
+                { val: 5, text: '5' }
             ];
-            // Added bg-gray-700 to match the dark theme
-            let html = `<select data-risk-id="${id}" class="risk-selector text-xs bg-gray-700" onchange="updateRisk(${id})">`;
+            let html = `<select data-risk-id="${id}" class="risk-selector text-xs bg-gray-700 border-none p-1 rounded-md" onchange="updateRisk(${id})">`;
             options.forEach(opt => {
-                html += `<option value="${opt.val}" ${opt.val === currentValue ? 'selected' : ''}>${opt.text}</option>`);
+                html += `<option value="${opt.val}" ${opt.val === currentValue ? 'selected' : ''}>${opt.text}</option>`;
             });
             html += `</select>`;
             return html;
         }
-
-        // --- 2. Main Rendering & Update Logic ---
 
         function renderRiskTable() {
             const tbody = document.getElementById('risk-body');
@@ -378,40 +533,45 @@
                 totalEffectiveness += risk.effectiveness;
 
                 const tr = document.createElement('tr');
-                tr.className = 'hover:bg-gray-700'; // Dark mode hover
+                tr.className = 'hover:bg-gray-700 transition-colors duration-150';
+                tr.setAttribute('data-risk-row-id', risk.id);
 
                 tr.innerHTML = `
-                    <td class="px-3 py-2 whitespace-nowrap font-medium text-gray-100">${risk.hazard}</td>
-                    <td class="px-3 py-2 whitespace-nowrap">${getDropdown(risk.id, risk.likelihood)}</td>
-                    <td class="px-3 py-2 whitespace-nowrap">${getDropdown(risk.id, risk.impact)}</td>
-                    <td class="px-3 py-2 text-center font-bold ${getRiskLevelClass(inherentScore)} rounded-md text-xs">${inherentScore}</td>
+                    <td class="px-3 py-2 font-medium text-gray-100">${risk.hazard}</td>
+                    <td class="px-3 py-2">${getDropdown(risk.id, risk.likelihood)}</td>
+                    <td class="px-3 py-2">${getDropdown(risk.id, risk.impact)}</td>
+                    <td class="px-3 py-2 text-center">
+                        <span class="${getRiskLevelClass(inherentScore)}">${inherentScore}</span>
+                    </td>
                     <td class="px-3 py-2">
                         <textarea data-risk-id="${risk.id}" class="risk-controls w-full h-12 text-xs bg-gray-700" onchange="updateRisk(${risk.id}, 'controls')">${risk.controls}</textarea>
                     </td>
                     <td class="px-3 py-2 text-center">
-                        <select data-risk-id="${risk.id}" class="risk-effectiveness text-xs bg-gray-700" onchange="updateRisk(${risk.id})">
-                            <option value="1" ${risk.effectiveness === 1 ? 'selected' : ''}>1 (None)</option>
-                            <option value="2" ${risk.effectiveness === 2 ? 'selected' : ''}>2 (Poor)</option>
-                            <option value="3" ${risk.effectiveness === 3 ? 'selected' : ''}>3 (Fair)</option>
-                            <option value="4" ${risk.effectiveness === 4 ? 'selected' : ''}>4 (Good)</option>
-                            <option value="5" ${risk.effectiveness === 5 ? 'selected' : ''}>5 (Excellent)</option>
+                        <select data-risk-id="${risk.id}" data-type="effectiveness" class="risk-effectiveness text-xs bg-gray-700 border-none p-1 rounded-md" onchange="updateRisk(${risk.id})">
+                            <option value="1" ${risk.effectiveness === 1 ? 'selected' : ''}>1</option>
+                            <option value="2" ${risk.effectiveness === 2 ? 'selected' : ''}>2</option>
+                            <option value="3" ${risk.effectiveness === 3 ? 'selected' : ''}>3</option>
+                            <option value="4" ${risk.effectiveness === 4 ? 'selected' : ''}>4</option>
+                            <option value="5" ${risk.effectiveness === 5 ? 'selected' : ''}>5</option>
                         </select>
                     </td>
-                    <td class="px-3 py-2 text-center font-bold ${getRiskLevelClass(residualScore)} rounded-md text-xs">${residualScore}</td>
                     <td class="px-3 py-2 text-center">
-                        <button onclick="deleteRisk(${risk.id})" class="text-red-500 hover:text-red-400 text-lg">🗑️</button>
+                        <span class="${getRiskLevelClass(residualScore)}">${residualScore}</span>
+                    </td>
+                    <td class="px-3 py-2 text-center">
+                        <button onclick="deleteRisk(${risk.id})" class="text-red-500 hover:text-red-400 text-lg transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                        </button>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
             
-            // Update Dashboard metrics
             document.getElementById('high-risk-count').innerText = highInherentCount;
             document.getElementById('migrated-risk-count').innerText = migratedToLowCount;
             const avgEff = risks.length > 0 ? (totalEffectiveness / risks.length).toFixed(1) : 0;
             document.getElementById('avg-control-eff').innerText = `${avgEff} / 5.0`;
 
-            // Rerender Chart
             updateMigrationChart();
         }
 
@@ -419,17 +579,19 @@
             const riskIndex = risks.findIndex(r => r.id === id);
             if (riskIndex === -1) return;
 
-            const riskElement = document.querySelector(`[data-risk-id="${id}"]`).closest('tr');
+            const tr = document.querySelector(`[data-risk-row-id="${id}"]`);
+            if (!tr) return;
             
             if (field === 'controls') {
-                risks[riskIndex].controls = riskElement.querySelector('.risk-controls').value;
+                risks[riskIndex].controls = tr.querySelector('.risk-controls').value;
             } else {
-                risks[riskIndex].likelihood = parseInt(riskElement.querySelector('.risk-selector:nth-child(1)').value);
-                risks[riskIndex].impact = parseInt(riskElement.querySelector('.risk-selector:nth-child(2)').value);
-                risks[riskIndex].effectiveness = parseInt(riskElement.querySelector('.risk-effectiveness').value);
+                const selectors = tr.querySelectorAll('.risk-selector');
+                risks[riskIndex].likelihood = parseInt(selectors[0].value);
+                risks[riskIndex].impact = parseInt(selectors[1].value);
+                risks[riskIndex].effectiveness = parseInt(tr.querySelector('.risk-effectiveness').value);
             }
             
-            renderRiskTable(); // Rerender to show new scores/colors
+            renderRiskTable(); 
         }
 
         function addRisk() {
@@ -453,10 +615,7 @@
             renderRiskTable();
         }
 
-        // --- 3. Chart Logic ---
-
         function updateMigrationChart() {
-            // Sort risks by Inherent Score descending, then take top 5
             const sortedRisks = [...risks].sort((a, b) => {
                 const scoreA = calculateScore(a.likelihood, a.impact, 0, 'inherent');
                 const scoreB = calculateScore(b.likelihood, b.impact, 0, 'inherent');
@@ -484,7 +643,7 @@
                         {
                             label: 'Inherent Risk (Before Controls)',
                             data: inherentScores,
-                            backgroundColor: 'rgba(239, 68, 68, 0.7)', // Red
+                            backgroundColor: 'rgba(239, 68, 68, 0.7)',
                             borderColor: 'rgba(239, 68, 68, 1)',
                             borderWidth: 1,
                             borderRadius: 4
@@ -492,7 +651,7 @@
                         {
                             label: 'Residual Risk (After Controls)',
                             data: residualScores,
-                            backgroundColor: 'rgba(0, 247, 255, 0.8)', // Cyan Primary
+                            backgroundColor: 'rgba(0, 247, 255, 0.8)',
                             borderColor: 'rgba(0, 247, 255, 1)',
                             borderWidth: 1,
                             borderRadius: 4
@@ -506,28 +665,28 @@
                         y: {
                             beginAtZero: true,
                             max: 25,
-                            title: { display: true, text: 'Risk Score (L x I)', color: '#a0a0a0', font: { family: 'Roboto Condensed', size: 14 } },
-                            ticks: { color: '#a0a0a0', font: { family: 'Roboto Condensed' } },
+                            title: { display: true, text: 'Risk Score (L x I)', color: '#a0a0a0', font: { family: 'Inter', size: 14 } },
+                            ticks: { color: '#a0a0a0', font: { family: 'Inter' } },
                             grid: { color: 'rgba(255, 255, 255, 0.1)' }
                         },
                         x: {
-                            title: { display: true, text: 'Top Priority Risks', color: '#a0a0a0', font: { family: 'Roboto Condensed', size: 14 } },
-                            ticks: { color: '#a0a0a0', font: { family: 'Roboto Condensed' } },
+                            title: { display: true, text: 'Top Priority Risks', color: '#a0a0a0', font: { family: 'Inter', size: 14 } },
+                            ticks: { color: '#a0a0a0', font: { family: 'Inter' } },
                             grid: { color: 'rgba(255, 255, 255, 0.1)' }
                         }
                     },
                     plugins: {
                         legend: {
                             labels: {
-                                color: '#e5e7eb', // Legend text color
-                                font: { family: 'Roboto Condensed' }
+                                color: '#e5e7eb',
+                                font: { family: 'Inter' }
                             }
                         },
                         tooltip: {
                             mode: 'index',
                             intersect: false,
-                            bodyFont: { family: 'Roboto Condensed' },
-                            titleFont: { family: 'Roboto Condensed', weight: 'bold' }
+                            bodyFont: { family: 'Inter' },
+                            titleFont: { family: 'Inter', weight: 'bold' }
                         }
                     }
                 }
@@ -535,44 +694,56 @@
             window.migrationChartInstance = migrationChartInstance;
         }
 
-        // --- 4. Navigation Logic ---
         function navTo(sectionId) {
             document.querySelectorAll('.content-section').forEach(el => {
                 el.classList.add('hidden');
             });
-            document.getElementById(sectionId).classList.remove('hidden');
             
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+            }
+
             document.getElementById('main-scroll').scrollTop = 0;
 
             document.querySelectorAll('.nav-item').forEach(el => {
                 el.classList.remove('bg-gray-700', 'border-primary');
                 el.classList.add('border-primary/0');
             });
-            const activeNav = document.getElementById('nav-' + sectionId);
+            
+            const activeNav = document.querySelector(`[onclick="navTo('${sectionId}')"]`);
             if(activeNav) {
                 activeNav.classList.add('bg-gray-700', 'border-primary');
                 activeNav.classList.remove('border-primary/0');
             }
 
-            // Chart update on entering the Review section
             if (sectionId === 'review') {
                 updateMigrationChart();
-                if (window.migrationChartInstance) window.migrationChartInstance.resize();
+                if (window.migrationChartInstance) window.migrationChartInstance.resize(); 
             }
 
-            // Close mobile menu if open
             if(window.innerWidth < 768) {
-                document.getElementById('sidebar').classList.add('-translate-x-full');
+                toggleMobileMenu();
             }
         }
 
-        // Mobile Menu Toggle
-        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+        function toggleMobileMenu() {
             const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('-translate-x-full');
-        });
+            const backdrop = document.getElementById('backdrop');
 
-        // Initial setup
+            const isHidden = sidebar.classList.contains('-translate-x-full');
+
+            if (isHidden) {
+                sidebar.classList.remove('-translate-x-full');
+                backdrop.classList.add('active');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                backdrop.classList.remove('active');
+            }
+        }
+
+        document.getElementById('mobile-menu-btn').addEventListener('click', toggleMobileMenu);
+
         window.onload = function() {
             renderRiskTable();
             navTo('context');
