@@ -85,9 +85,10 @@
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
                             Launch CAST Tool
                         </a>
-                        <a href="https://acleddata.com/country/philippines" target="_blank" class="flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 text-white py-3 rounded-xl font-semibold text-sm transition-all border border-slate-600">
+                        <!-- UPDATED URL as requested -->
+                        <a href="https://acleddata.com/platform/cast-conflict-alert-system" target="_blank" class="flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 text-white py-3 rounded-xl font-semibold text-sm transition-all border border-slate-600">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0121 18.382V7.618a1 1 0 01-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
-                            Country Profile
+                            Launch CAST Map
                         </a>
                     </div>
                 </div>
@@ -144,12 +145,12 @@
             <div class="absolute inset-0 flex flex-col items-center justify-center text-slate-500 z-0">
                 <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500 mb-2"></div>
                 <p class="text-xs">Loading ACLED CAST...</p>
-                <p class="text-[10px] mt-2 px-4 text-center">If blank, the site blocks embedding. Use the "Dashboard" tab to launch.</p>
+                <p class="text-[10px] mt-2 px-4 text-center">If blank, the site blocks embedding or the country filter failed. Use the "Dashboard" tab to launch.</p>
             </div>
             <!-- Note: ACLED likely blocks iframes via X-Frame-Options. The dashboard tab is the fallback. -->
             <iframe 
                 id="acled-frame"
-                data-src="https://acleddata.com/platform/cast-conflict-alert-system" 
+                data-src="https://acleddata.com/platform/cast-conflict-alert-system?country=Philippines" 
                 class="absolute inset-0 w-full h-full z-10 border-0"
                 sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
             ></iframe>
@@ -206,6 +207,7 @@
 
             // Lazy Load Iframe only when clicked to save bandwidth/prevent errors
             if (tabName === 'embed' && !iframe.src) {
+                // The new data-src includes the filter attempt: ?country=Philippines
                 iframe.src = iframe.getAttribute('data-src');
             }
         }
