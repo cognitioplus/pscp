@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PH Hazard Watch</title>
+    <meta name="description" content="A PWA launcher and safety guide for UP NOAH's Know Your Hazards tool.">
+    <meta name="theme-color" content="#0f172a">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" id="my-manifest">
+    <script>
+        const manifest = {
+            "name": "Hazard Watch",
+            "short_name": "HazardWatch",
+            "start_url": ".",
+            "display": "standalone",
+            "background_color": "#0f172a",
+            "theme_color": "#0f172a",
+            "orientation": "portrait-primary",
+            "icons": [
+                {
+                    "src": "https://cdn-icons-png.flaticon.com/512/2646/2646069.png", 
+                    "sizes": "192x192",
+                    "type": "image/png"
+                },
+                {
+                    "src": "https://cdn-icons-png.flaticon.com/512/2646/2646069.png",
+                    "sizes": "512x512",
+                    "type": "image/png"
+                }
+            ]
+        };
+        const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+        document.querySelector('#my-manifest').setAttribute('href', URL.createObjectURL(blob));
+    </script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-red-500 selection:text-white">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-slate-900/95 backdrop-blur border-b border-slate-800 px-4 py-4 flex items-center justify-between shadow-lg">
+        <div class="flex items-center space-x-2">
+            <div class="bg-red-600 p-1.5 rounded-lg">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            </div>
+            <h1 class="font-bold text-lg tracking-tight">Hazard<span class="text-slate-400 font-normal">Watch</span></h1>
+        </div>
+        <div class="text-xs text-slate-500 font-medium px-2 py-1 bg-slate-800 rounded border border-slate-700">
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 w-full max-w-md mx-auto p-4 flex flex-col space-y-6">
+
+        <!-- Launch Card (Hero) -->
+        <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-6 border border-slate-700 shadow-xl text-center relative overflow-hidden group">
+            <!-- Background pattern -->
+            <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+            
+            <div class="relative z-10">
+                <h2 class="text-2xl font-bold text-white mb-2">Check Your Hazards</h2>
+                <p class="text-slate-400 text-sm mb-6">
+                    Assess flood, landslide, and storm surge risks in your area using the official UP NOAH database.
+                </p>
+                
+                <a href="https://noah.up.edu.ph/know-your-hazards" target="_blank" rel="noopener noreferrer" 
+                   class="inline-flex items-center justify-center w-full py-3.5 px-6 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl transition-all transform active:scale-95 shadow-lg shadow-red-900/30">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0121 18.382V7.618a1 1 0 01-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+                    Launch Map Tool
+                </a>
+                <p class="text-[10px] text-slate-500 mt-3 uppercase tracking-wider">Opens external site (UP NOAH)</p>
+            </div>
+        </div>
+
+        <!-- Safety Guide Grid -->
+        <div class="space-y-4">
+            <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-widest pl-1">Offline Survival Guide</h3>
+            
+            <!-- Floods -->
+            <div class="bg-slate-800 rounded-xl p-5 border border-slate-700/50 hover:border-blue-500/30 transition-colors">
+                <div class="flex items-center mb-3">
+                    <div class="p-2 bg-blue-900/30 rounded-lg mr-3 text-blue-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                    </div>
+                    <h4 class="font-bold text-lg text-blue-100">Flood</h4>
+                </div>
+                <ul class="text-sm text-slate-300 space-y-2 list-disc list-inside marker:text-blue-500">
+                    <li><strong>Evacuate immediately</strong> if advised by LGUs.</li>
+                    <li>Avoid wading in water (Leptospirosis risk).</li>
+                    <li>Switch off main power & gas lines.</li>
+                    <li>Secure valuables on high ground.</li>
+                </ul>
+            </div>
+
+            <!-- Landslides -->
+            <div class="bg-slate-800 rounded-xl p-5 border border-slate-700/50 hover:border-amber-500/30 transition-colors">
+                <div class="flex items-center mb-3">
+                    <div class="p-2 bg-amber-900/30 rounded-lg mr-3 text-amber-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                    </div>
+                    <h4 class="font-bold text-lg text-amber-100">Landslide</h4>
+                </div>
+                <ul class="text-sm text-slate-300 space-y-2 list-disc list-inside marker:text-amber-500">
+                    <li>Listen for rumbling or cracking trees.</li>
+                    <li>Watch for new cracks in walls/floors.</li>
+                    <li><strong>Drop, Cover, and Hold</strong> if debris falls.</li>
+                    <li>Avoid sleeping in landslide-prone areas during rain.</li>
+                </ul>
+            </div>
+
+            <!-- Storm Surge -->
+            <div class="bg-slate-800 rounded-xl p-5 border border-slate-700/50 hover:border-cyan-500/30 transition-colors">
+                <div class="flex items-center mb-3">
+                    <div class="p-2 bg-cyan-900/30 rounded-lg mr-3 text-cyan-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                    </div>
+                    <h4 class="font-bold text-lg text-cyan-100">Storm Surge</h4>
+                </div>
+                <ul class="text-sm text-slate-300 space-y-2 list-disc list-inside marker:text-cyan-500">
+                    <li>Move to <strong>high ground</strong> far from coast.</li>
+                    <li>Do not stay in beach-level structures.</li>
+                    <li>Prepare a Go-Bag (food/water for 3 days).</li>
+                    <li>Wait for official "All Clear" signal.</li>
+                </ul>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Service Worker for Offline Capability -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                const CACHE_NAME = 'noah-guide-v2';
+                const ASSETS = ['https://cdn.tailwindcss.com'];
+                
+                self.addEventListener('install', (e) => {
+                    self.skipWaiting();
+                    e.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)));
+                });
+                
+                self.addEventListener('activate', (e) => {
+                    e.waitUntil(self.clients.claim());
+                });
+
+                self.addEventListener('fetch', (e) => {
+                    // Stale-while-revalidate strategy
+                    e.respondWith(
+                        caches.match(e.request).then((cachedResponse) => {
+                            const fetchPromise = fetch(e.request).then((networkResponse) => {
+                                caches.open(CACHE_NAME).then((cache) => {
+                                    if(e.request.method === 'GET' && e.request.url.startsWith('http')) {
+                                        cache.put(e.request, networkResponse.clone());
+                                    }
+                                });
+                                return networkResponse;
+                            }).catch(() => cachedResponse); // Fallback to cache if offline
+                            return cachedResponse || fetchPromise;
+                        })
+                    );
+                });
+            `;
+            const blob = new Blob([swCode], {type: 'application/javascript'});
+            navigator.serviceWorker.register(URL.createObjectURL(blob))
+                .then(() => console.log('Offline Ready'))
+                .catch(console.error);
+        }
+    </script>
+</body>
+</html>
