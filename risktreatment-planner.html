@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risk Assessment and Treatment Planner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, collection, onSnapshot, query, deleteDoc, updateDoc, orderBy, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global variables provided by the environment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'risk-planner-default-app';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // --- Firebase Initialization and Authentication ---
+        let app;
+        let db;
+        let auth;
+        let userId = 'anonymous'; // Default until auth state is known
+
+        // Utility function to initialize Firebase and authenticate
+        const initializeFirebase = async () => {
+            if (!firebaseConfig) {
+                console.error("Firebase config is missing.");
+                return;
+            }
+
+            try {
+                // Set Firestore log level for debugging
+                setLogLevel('error'); // Changed from Debug to error to reduce console clutter unless needed
+
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                // Sign in with custom token or anonymously
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                // Listen for authentication state changes
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        console.log("Firebase Auth State Changed. User ID:", userId);
+                        // Once authenticated, start listening to data
+                        setupRealtimeListeners();
+                        document.getElementById('user-id-display').textContent = `User ID: ${userId}`;
+                        document.getElementById('user-id-display').classList.remove('hidden');
+                    } else {
+                        userId = 'anonymous';
+                        console.log("Firebase Auth State Changed. User is anonymous/signed out.");
+                    }
+                });
+
+            } catch (error) {
+                console.error("Firebase initialization or authentication failed:", error);
+                document.getElementById('status-message').textContent = `Authentication Error: ${error.message}`;
+                document.getElementById('status-message').classList.remove('hidden');
+            }
+        };
+
+        // --- Firestore Utilities ---
+
+        // Get the collection reference for the user's private risk data
+        const getRisksCollectionRef = () => {
+            // Path: /artifacts/{appId}/users/{userId}/risks
+            return collection(db, `artifacts/${appId}/users/${userId}/risks`);
+        };
+
+        // --- Data Functions ---
+
+        // Add a new risk
+        const addRisk = async (riskData) => {
+            if (!db || !userId) {
+                console.error("Database or User ID not ready.");
+                return;
+            }
+            try {
+                const docRef = await setDoc(doc(getRisksCollectionRef()), {
+                    ...riskData,
+                    createdAt: serverTimestamp(),
+                    likelihood: parseInt(riskData.likelihood),
+                    impact: parseInt(riskData.impact),
+                });
+                console.log("Risk added/updated successfully.");
+            } catch (e) {
+                console.error("Error adding/updating risk: ", e);
+                showNotification("Failed to save risk.", 'error');
+            }
+        };
+
+        // Delete a risk
+        const deleteRisk = async (riskId) => {
+            if (!db || !userId) {
+                console.error("Database or User ID not ready.");
+                return;
+            }
+            try {
+                await deleteDoc(doc(getRisksCollectionRef(), riskId));
+                console.log("Risk deleted successfully.");
+                showNotification("Risk deleted.", 'success');
+            } catch (e) {
+                console.error("Error deleting document: ", e);
+                showNotification("Failed to delete risk.", 'error');
+            }
+        };
+
+        // Update risk treatment status
+        const updateTreatmentStatus = async (riskId, status) => {
+            if (!db || !userId) {
+                console.error("Database or User ID not ready.");
+                return;
+            }
+            try {
+                await updateDoc(doc(getRisksCollectionRef(), riskId), {
+                    treatmentStatus: status
+                });
+                console.log("Treatment status updated.");
+                showNotification("Treatment status updated.", 'success');
+            } catch (e) {
+                console.error("Error updating treatment status: ", e);
+                showNotification("Failed to update status.", 'error');
+            }
+        };
+
+
+        // --- Real-time Listener ---
+
+        const setupRealtimeListeners = () => {
+            if (!db || userId === 'anonymous') {
+                console.log("Skipping listener setup: DB or Auth not ready.");
+                return;
+            }
+
+            const risksQuery = query(getRisksCollectionRef());
+
+            onSnapshot(risksQuery, (snapshot) => {
+                const risks = [];
+                snapshot.forEach((doc) => {
+                    risks.push({ id: doc.id, ...doc.data() });
+                });
+                console.log("Realtime risk data received:", risks);
+                renderRiskTable(risks);
+                renderRiskMatrix(risks);
+            }, (error) => {
+                console.error("Error listening to risks:", error);
+                showNotification("Realtime data synchronization failed.", 'error');
+            });
+        };
+
+
+        // --- UI Rendering Functions ---
+
+        // Function to determine the risk level (Severity)
+        const getRiskLevel = (likelihood, impact) => {
+            const score = likelihood * impact;
+            if (score >= 15) return { level: 'Extreme', color: 'bg-red-600', text: 'text-white' };
+            if (score >= 8) return { level: 'High', color: 'bg-orange-500', text: 'text-white' };
+            if (score >= 4) return { level: 'Medium', color: 'bg-yellow-400', text: 'text-gray-900' };
+            return { level: 'Low', color: 'bg-green-400', text: 'text-gray-900' };
+        };
+
+        // ** Fix applied here: Ensure that the 'risk' object is destructured or accessed correctly within the forEach **
+        const renderRiskTable = (risks) => {
+            const tableBody = document.getElementById('risk-table-body');
+            if (!tableBody) return;
+
+            tableBody.innerHTML = ''; // Clear existing rows
+
+            risks.sort((a, b) => (b.likelihood * b.impact) - (a.likelihood * a.impact));
+
+            risks.forEach(risk => {
+                const { level, color, text } = getRiskLevel(risk.likelihood, risk.impact);
+                const score = risk.likelihood * risk.impact;
+                const row = document.createElement('tr');
+                row.className = 'bg-white border-b hover:bg-gray-50';
+                
+                // Get the ID for use in buttons/selectors
+                const riskId = risk.id; // Corrected: using risk.id
+
+                row.innerHTML = `
+                    <td class="px-6 py-4 font-medium text-gray-900 w-1/4">${risk.name}</td>
+                    <td class="px-6 py-4">${risk.description}</td>
+                    <td class="px-6 py-4 text-center">${risk.likelihood}</td>
+                    <td class="px-6 py-4 text-center">${risk.impact}</td>
+                    <td class="px-6 py-4 text-center">
+                        <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium ${color} ${text}">
+                            ${level} (${score})
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 w-1/4">
+                        <select
+                            data-risk-id="${riskId}"
+                            class="treatment-status-select bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                        >
+                            <option value="Untreated" ${risk.treatmentStatus === 'Untreated' ? 'selected' : ''}>Untreated</option>
+                            <option value="Mitigated" ${risk.treatmentStatus === 'Mitigated' ? 'selected' : ''}>Mitigated</option>
+                            <option value="Accepted" ${risk.treatmentStatus === 'Accepted' ? 'selected' : ''}>Accepted</option>
+                            <option value="Transferred" ${risk.treatmentStatus === 'Transferred' ? 'selected' : ''}>Transferred</option>
+                        </select>
+                    </td>
+                    <td class="px-6 py-4">
+                        <button
+                            data-risk-id="${riskId}"
+                            class="delete-risk-btn text-red-600 hover:text-red-900 font-medium py-1 px-3 rounded-md transition duration-150"
+                        >
+                            Delete
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            // Attach event listeners for treatment status change
+            document.querySelectorAll('.treatment-status-select').forEach(select => {
+                select.onchange = (e) => {
+                    const riskId = e.target.dataset.riskId;
+                    const newStatus = e.target.value;
+                    updateTreatmentStatus(riskId, newStatus);
+                };
+            });
+
+            // Attach event listeners for delete button
+            document.querySelectorAll('.delete-risk-btn').forEach(button => {
+                button.onclick = (e) => {
+                    const riskId = e.target.dataset.riskId;
+                    showConfirmModal('Confirm Deletion', 'Are you sure you want to delete this risk assessment?', () => deleteRisk(riskId));
+                };
+            });
+        };
+
+        const renderRiskMatrix = (risks) => {
+            const matrixContainer = document.getElementById('risk-matrix-container');
+            if (!matrixContainer) return;
+
+            // Initialize matrix cells
+            const matrix = {};
+            for (let l = 1; l <= 5; l++) {
+                for (let i = 1; i <= 5; i++) {
+                    matrix[`${l}-${i}`] = [];
+                }
+            }
+
+            // Populate matrix cells with risks
+            risks.forEach(risk => {
+                const key = `${risk.likelihood}-${risk.impact}`;
+                if (matrix[key]) {
+                    matrix[key].push(risk);
+                }
+            });
+
+            let matrixHTML = `
+                <div class="p-4 bg-gray-50 rounded-lg shadow-inner">
+                    <h3 class="text-xl font-semibold mb-3 text-gray-800">Risk Matrix (Likelihood vs. Impact)</h3>
+                    <div class="grid grid-cols-6 gap-0 border border-gray-300">
+                        <div class="col-span-1 row-span-1 bg-gray-200 p-2 font-bold text-center flex items-center justify-center text-sm">L / I</div>
+            `;
+
+            // Impact Headers (1 to 5)
+            for (let i = 1; i <= 5; i++) {
+                matrixHTML += `<div class="bg-gray-200 p-2 font-bold text-center text-sm">Impact ${i}</div>`;
+            }
+
+            // Likelihood Rows (5 down to 1)
+            for (let l = 5; l >= 1; l--) {
+                // Likelihood Header
+                matrixHTML += `<div class="bg-gray-200 p-2 font-bold text-center text-sm flex items-center justify-center">Likelihood ${l}</div>`;
+
+                // Cells
+                for (let i = 1; i <= 5; i++) {
+                    const riskList = matrix[`${l}-${i}`];
+                    const { level, color, text } = getRiskLevel(l, i);
+                    const riskCount = riskList.length;
+
+                    matrixHTML += `
+                        <div class="${color} p-1 h-20 flex flex-col items-center justify-center transition duration-200 hover:scale-[1.02] cursor-pointer" data-l="${l}" data-i="${i}">
+                            <div class="font-bold text-xs ${text}">${level}</div>
+                            <div class="text-xl font-extrabold ${text}">${riskCount}</div>
+                            <div class="text-xs ${text} opacity-75">Risk${riskCount !== 1 ? 's' : ''}</div>
+                        </div>
+                    `;
+                }
+            }
+
+            matrixHTML += `</div></div>`;
+            matrixContainer.innerHTML = matrixHTML;
+
+            // Add event listeners to matrix cells
+            document.querySelectorAll('#risk-matrix-container [data-l][data-i]').forEach(cell => {
+                cell.onclick = (e) => {
+                    const l = parseInt(e.currentTarget.dataset.l);
+                    const i = parseInt(e.currentTarget.dataset.i);
+                    const key = `${l}-${i}`;
+                    const riskList = matrix[key];
+                    showMatrixDetailsModal(l, i, riskList);
+                };
+            });
+        };
+
+        // --- Form Handling ---
+
+        const handleFormSubmit = (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const riskData = {
+                name: form.riskName.value,
+                description: form.riskDescription.value,
+                likelihood: form.likelihood.value,
+                impact: form.impact.value,
+                treatmentStatus: 'Untreated', // Default status
+            };
+            addRisk(riskData);
+            form.reset(); // Clear form after submission
+            hideModal('add-risk-modal');
+        };
+
+        // --- Modal/Notification Functions ---
+
+        // Simple Notification
+        const showNotification = (message, type = 'info') => {
+            const notification = document.getElementById('notification-toast');
+            const colorClass = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+            notification.textContent = message;
+            notification.className = `fixed bottom-5 right-5 p-4 rounded-lg shadow-xl text-white transition-opacity duration-300 ${colorClass}`;
+            notification.classList.remove('opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                notification.classList.add('opacity-0', 'pointer-events-none');
+            }, 3000);
+        };
+
+        // Generic Modal Handler
+        const showModal = (modalId) => {
+            document.getElementById(modalId).classList.remove('hidden');
+        };
+
+        const hideModal = (modalId) => {
+            document.getElementById(modalId).classList.add('hidden');
+        };
+
+        // Confirmation Modal
+        let currentConfirmAction = () => {};
+
+        const showConfirmModal = (title, message, callback) => {
+            document.getElementById('confirm-modal-title').textContent = title;
+            document.getElementById('confirm-modal-message').textContent = message;
+            currentConfirmAction = callback;
+            showModal('confirm-modal');
+        };
+
+        const handleConfirm = () => {
+            currentConfirmAction();
+            hideModal('confirm-modal');
+        };
+
+
+        // Matrix Details Modal
+        const showMatrixDetailsModal = (l, i, risks) => {
+            const modal = document.getElementById('matrix-details-modal');
+            const titleElement = document.getElementById('matrix-details-title');
+            const bodyElement = document.getElementById('matrix-details-body');
+
+            titleElement.textContent = `Risks in Likelihood ${l} / Impact ${i} (${getRiskLevel(l, i).level})`;
+            bodyElement.innerHTML = ''; // Clear previous content
+
+            if (risks.length === 0) {
+                bodyElement.innerHTML = `<p class="p-4 text-gray-500 italic">No risks defined for this cell.</p>`;
+            } else {
+                const list = document.createElement('ul');
+                list.className = 'divide-y divide-gray-200';
+                risks.forEach(risk => {
+                    const item = document.createElement('li');
+                    item.className = 'p-4 hover:bg-gray-50';
+                    item.innerHTML = `
+                        <p class="font-semibold text-gray-800">${risk.name}</p>
+                        <p class="text-sm text-gray-600">${risk.description}</p>
+                        <div class="mt-1 flex space-x-4 text-xs">
+                            <span class="text-blue-600">L: ${risk.likelihood}</span>
+                            <span class="text-blue-600">I: ${risk.impact}</span>
+                            <span class="text-green-600">Status: ${risk.treatmentStatus}</span>
+                        </div>
+                    `;
+                    list.appendChild(item);
+                });
+                bodyElement.appendChild(list);
+            }
+
+            showModal('matrix-details-modal');
+        };
+
+
+        // --- Event Listeners and Initialization ---
+
+        window.onload = function () {
+            // Initialize Firebase and set up auth listener
+            initializeFirebase();
+
+            // Set up main form submission listener
+            document.getElementById('add-risk-form').onsubmit = handleFormSubmit;
+
+            // Setup modal open/close listeners
+            document.getElementById('open-add-risk-modal').onclick = () => showModal('add-risk-modal');
+            document.getElementById('close-add-risk-modal').onclick = () => hideModal('add-risk-modal');
+            document.getElementById('confirm-yes-btn').onclick = handleConfirm;
+            document.getElementById('confirm-no-btn').onclick = () => hideModal('confirm-modal');
+            document.getElementById('close-matrix-details-modal').onclick = () => hideModal('matrix-details-modal');
+        };
+
+        // Make functions accessible in the global scope if needed for testing (not strictly required in module script)
+        window.deleteRisk = deleteRisk;
+        window.updateTreatmentStatus = updateTreatmentStatus;
+
+
+    </script>
+    <style>
+        /* Custom styles for better visual hierarchy and readability */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f9;
+        }
+        .container-shadow {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Main Application Container -->
+    <div class="min-h-screen p-4 md:p-8">
+        <header class="mb-8 p-6 bg-white rounded-xl container-shadow">
+            <h1 class="text-3xl font-extrabold text-gray-900 mb-2">Continuity Risk Planner</h1>
+            <p class="text-gray-600">Assess and manage potential risks to public service continuity using the risk matrix.</p>
+            <div id="user-id-display" class="text-xs text-gray-500 mt-2 p-1 bg-gray-100 rounded-md hidden"></div>
+            <div id="status-message" class="mt-2 text-sm text-red-500 hidden"></div>
+        </header>
+
+        <!-- Risk Matrix Section -->
+        <div id="risk-matrix-container" class="mb-8">
+            <!-- Risk Matrix will be rendered here by JavaScript -->
+        </div>
+
+        <!-- Risk Actions -->
+        <div class="flex justify-end mb-6">
+            <button id="open-add-risk-modal"
+                    class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-300 transform hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50">
+                + Add New Risk
+            </button>
+        </div>
+
+        <!-- Risk Table Section -->
+        <div class="bg-white p-6 rounded-xl container-shadow overflow-x-auto">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Risk Register</h2>
+            <table class="min-w-full text-sm text-left text-gray-500">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-100">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 rounded-tl-lg">Risk Name</th>
+                        <th scope="col" class="px-6 py-3">Description</th>
+                        <th scope="col" class="px-6 py-3 text-center">Likelihood (L)</th>
+                        <th scope="col" class="px-6 py-3 text-center">Impact (I)</th>
+                        <th scope="col" class="px-6 py-3 text-center">Severity (L x I)</th>
+                        <th scope="col" class="px-6 py-3">Treatment Status</th>
+                        <th scope="col" class="px-6 py-3 rounded-tr-lg">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="risk-table-body">
+                    <!-- Risk data rows will be injected here by JavaScript -->
+                    <tr><td colspan="7" class="text-center py-4 text-gray-500 italic">Loading risks...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <!-- --- Modals --- -->
+
+    <!-- Add/Edit Risk Modal -->
+    <div id="add-risk-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg">
+            <div class="p-6 border-b flex justify-between items-center">
+                <h3 class="text-xl font-bold text-gray-800">Add New Risk</h3>
+                <button id="close-add-risk-modal" class="text-gray-400 hover:text-gray-600 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <form id="add-risk-form" class="p-6 space-y-4">
+                <div>
+                    <label for="riskName" class="block text-sm font-medium text-gray-700 mb-1">Risk Name</label>
+                    <input type="text" id="riskName" name="riskName" required
+                           class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label for="riskDescription" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea id="riskDescription" name="riskDescription" rows="3" required
+                              class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="likelihood" class="block text-sm font-medium text-gray-700 mb-1">Likelihood (1-5)</label>
+                        <input type="number" id="likelihood" name="likelihood" min="1" max="5" required value="3"
+                               class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="impact" class="block text-sm font-medium text-gray-700 mb-1">Impact (1-5)</label>
+                        <input type="number" id="impact" name="impact" min="1" max="5" required value="3"
+                               class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+                <div class="pt-4 flex justify-end">
+                    <button type="submit"
+                            class="px-5 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 transition duration-150">
+                        Save Risk
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirm-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm">
+            <div class="p-6">
+                <h3 id="confirm-modal-title" class="text-lg font-bold text-gray-800 mb-2">Confirm Action</h3>
+                <p id="confirm-modal-message" class="text-sm text-gray-600 mb-4">Are you sure?</p>
+                <div class="flex justify-end space-x-3">
+                    <button id="confirm-no-btn"
+                            class="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-100 transition duration-150">
+                        Cancel
+                    </button>
+                    <button id="confirm-yes-btn"
+                            class="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition duration-150">
+                        Yes, Proceed
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Matrix Details Modal -->
+    <div id="matrix-details-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b flex justify-between items-center sticky top-0 bg-white">
+                <h3 id="matrix-details-title" class="text-xl font-bold text-gray-800">Risk Details</h3>
+                <button id="close-matrix-details-modal" class="text-gray-400 hover:text-gray-600 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="matrix-details-body" class="p-6">
+                <!-- Details will be injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="notification-toast" class="opacity-0 pointer-events-none fixed bottom-5 right-5 p-4 rounded-lg shadow-xl text-white transition-opacity duration-300">
+        Message goes here
+    </div>
+
+</body>
+</html>
