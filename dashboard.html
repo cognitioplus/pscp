@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSCP Real-Time Status Dashboard</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f7f9fc; }
+        /* Custom scrollbar for better aesthetics */
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background-color: #9ca3af; border-radius: 3px; }
+        .custom-scroll::-webkit-scrollbar-track { background-color: #e5e7eb; }
+    </style>
+</head>
+<body>
+
+<div id="app" class="min-h-screen p-4 sm:p-8">
+    <header class="mb-8">
+        <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 border-b-4 border-indigo-500 pb-2">
+            PSCP Real-Time Dashboard
+        </h1>
+        <p class="text-gray-600 mt-2">
+            Centralized monitoring of Public Service Continuity Plan.
+        </p>
+        <p id="user-info" class="text-xs text-gray-500 mt-1">Status: Initializing...</p>
+    </header>
+
+    <!-- Main Content Grid -->
+    <div id="dashboard-content" class="grid grid-cols-1 lg:col-span-3 gap-6">
+
+        <!-- 1. Status Indicator Card (Coherent View 1) -->
+        <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg transition duration-300 hover:shadow-xl">
+            <h2 class="text-xl font-semibold mb-4 text-indigo-700">Current PSCP Phase</h2>
+            <div id="status-indicator" class="flex items-center justify-between p-4 rounded-lg bg-gray-100">
+                <p id="current-status-text" class="text-2xl font-bold text-gray-800">Loading...</p>
+                <div id="status-dot" class="w-4 h-4 rounded-full shadow-lg"></div>
+            </div>
+
+            <div class="mt-4">
+                <label for="status-select" class="block text-sm font-medium text-gray-700 mb-2">Update Phase:</label>
+                <select id="status-select" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition duration-150 ease-in-out">
+                    <option value="Pre-Disaster">Pre-Disaster / Normal Operations</option>
+                    <option value="Alert">Alert Phase (Pre-Activation)</option>
+                    <option value="Activation">Activation Phase</option>
+                    <option value="Recovery">Recovery & Transition</option>
+                    <option value="Cessation">Cessation & Demobilization</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 2. Recovery Checklist Card (Coherent View 2 - Data Input) -->
+        <div class="bg-white p-6 rounded-xl shadow-lg transition duration-300 hover:shadow-xl">
+            <h2 class="text-xl font-semibold mb-4 text-indigo-700">Recovery Priorities Checklist</h2>
+            <div id="checklist-container" class="space-y-3 custom-scroll max-h-96 overflow-y-auto">
+                <p class="text-gray-500">Loading tasks...</p>
+            </div>
+            <p id="progress-text" class="mt-4 text-sm font-medium text-gray-600">Progress: 0/0 tasks (0%)</p>
+            <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                <div id="progress-bar" class="bg-indigo-600 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Real-Time Log (Synchronization Evidence) -->
+    <div class="mt-8 bg-white p-6 rounded-xl shadow-lg transition duration-300 hover:shadow-xl">
+        <h2 class="text-xl font-semibold mb-4 text-indigo-700">Real-Time Activity Log</h2>
+        <div id="log-container" class="bg-gray-50 p-4 rounded-lg custom-scroll max-h-48 overflow-y-auto text-sm text-gray-700 space-y-1">
+            <p>Initializing dashboard and connecting to Supabase...</p>
+        </div>
+    </div>
+</div>
+
+<!-- Supabase and JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script type="module">
+    // --- 1. SUPABASE CONFIGURATION ---
+    // The following credentials have been inserted:
+    const SUPABASE_URL = "https://yzondwndnezajbgjpixf.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6b25kd25kbmV6YWpiZ2pwaXhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4MzI2OTIsImV4cCI6MjA4MDQwODY5Mn0.a64H5n3duoR3VkbeC0-5YiVFU2k-uNh9FPCORMQV6lY";
+    
+    // Database constants
+    const PSCP_TABLE_NAME = "pcsp_status"; 
+    const PSCP_RECORD_ID = 1; // We target a single record with ID 1 for the global state
+
+    // Set up initial state data structure (used if no record exists)
+    // FIX: Reverting to 'tasks'. This array is used for the checklist UI logic.
+    const initialPSCPState = {
+        id: PSCP_RECORD_ID,
+        phase: "Pre-Disaster",
+        tasks: [
+            { id: 'T1', text: 'Validate Emergency Contact List (Appendix A)', completed: false },
+            { id: 'T2', text: 'Secure Alternate Site Communications (Appendix C)', completed: false },
+            { id: 'T3', text: 'Activate Critical IT Systems (Appendix G)', completed: false },
+            { id: 'T4', text: 'Commence Alternate Site Operations', completed: false },
+        ]
+    };
+
+    // Global Supabase client variable
+    let supabase;
+    let userId = 'anon_user_' + Math.random().toString(36).substring(2, 9); // Simple anonymous ID
+    
+    // --- 2. INITIALIZATION ---
+
+    /**
+     * Initializes the Supabase client and starts the real-time listener.
+     */
+    function initializeSupabase() {
+        if (SUPABASE_URL === "https://yzondwndnezajbgjpixf.supabase.co" && SUPABASE_ANON_KEY.includes("YOUR_SUPABASE_ANON_KEY")) {
+             // This check confirms the user didn't overwrite the key but left the URL, so it falls back to mock data 
+             // in case of missing or incorrect key setup. However, since the user provided the credentials, 
+             // we proceed directly with client creation.
+        }
+        
+        try {
+            // Create the Supabase client. Accessing `window.supabase` exposes the library 
+            // loaded via the CDN script tag to the module scope.
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            document.getElementById('user-info').textContent = `User ID: ${userId} (Supabase Ready)`;
+            appendLog("Supabase client initialized. Starting data listeners.");
+            startRealTimeListener();
+
+        } catch (error) {
+            console.error("Supabase Initialization Error:", error);
+            appendLog(`Error initializing Supabase: ${error.message}`, 'text-red-500');
+        }
+    }
+
+    /**
+     * Appends a message to the real-time activity log.
+     * @param {string} message - The log message.
+     * @param {string} colorClass - Tailwind color class for the text.
+     */
+    function appendLog(message, colorClass = 'text-gray-700') {
+        const logContainer = document.getElementById('log-container');
+        const timestamp = new Date().toLocaleTimeString();
+        const p = document.createElement('p');
+        p.className = colorClass;
+        p.innerHTML = `<span class="font-mono text-xs text-gray-400 mr-2">[${timestamp}]</span> ${message}`;
+        logContainer.prepend(p); // Add to the top
+        if (logContainer.children.length > 20) logContainer.removeChild(logContainer.lastChild);
+    }
+
+    // --- 3. DATA SYNCHRONIZATION ---
+
+    /**
+     * Fetches initial state and sets up the real-time listener for the PSCP record.
+     */
+    async function startRealTimeListener() {
+        if (!supabase) return;
+
+        // 1. Initial Fetch
+        const { data, error } = await supabase
+            .from(PSCP_TABLE_NAME)
+            .select('*')
+            .eq('id', PSCP_RECORD_ID)
+            .single();
+
+        if (error && error.code !== 'PGRST116') { // PGRST116 means "No rows found"
+            console.error("Initial Supabase Fetch Error:", error);
+            appendLog(`ERROR: Initial data fetch failed: ${error.message}`, 'text-red-500');
+            return;
+        }
+
+        let pscpState;
+
+        if (error && error.code === 'PGRST116') {
+             // Record doesn't exist, create it with initial data
+            appendLog("PSCP status record not found. Initializing new record.", 'text-yellow-600');
+            
+            // FIX: Create a safe object for insertion, excluding the 'tasks' array.
+            // This prevents the PGRST204 error if the 'tasks' column is missing from the database schema.
+            const safeInsertState = {
+                id: initialPSCPState.id,
+                phase: initialPSCPState.phase
+            };
+
+            const { data: insertedData, error: insertError } = await supabase
+                .from(PSCP_TABLE_NAME)
+                .insert(safeInsertState) // Use the safe object
+                .select()
+                .single();
+
+            if (insertError) {
+                console.error("Supabase Insert Error:", insertError);
+                appendLog(`ERROR: Could not insert initial record: ${insertError.message}`, 'text-red-500');
+                return;
+            }
+            pscpState = insertedData;
+            // Since we inserted without tasks, we use the local definition for the first render
+            pscpState.tasks = initialPSCPState.tasks;
+
+        } else if (data) {
+            // Record found, use it
+            pscpState = data;
+            // FIX: If the fetched data is missing the tasks property (due to missing DB column), use the local default.
+            if (!pscpState.tasks) {
+                 pscpState.tasks = initialPSCPState.tasks;
+            }
+        }
+        
+        // Initial render
+        if (pscpState) {
+            renderDashboard(pscpState);
+            appendLog(`Initial dashboard state loaded. Phase: ${pscpState.phase}`);
+        }
+
+
+        // 2. Real-time Subscription
+        supabase
+            .channel('pscp_updates')
+            .on('postgres_changes', 
+                { 
+                    event: 'UPDATE', 
+                    schema: 'public', 
+                    table: PSCP_TABLE_NAME, 
+                    filter: `id=eq.${PSCP_RECORD_ID}` 
+                }, 
+                (payload) => {
+                    const updatedState = payload.new;
+                    // FIX: If updated state is missing tasks, use local fallback.
+                    if (!updatedState.tasks) {
+                        updatedState.tasks = initialPSCPState.tasks;
+                    }
+                    renderDashboard(updatedState);
+                    appendLog(`Dashboard synchronized by Supabase Realtime. Phase is now: ${updatedState.phase}`);
+                }
+            )
+            .subscribe();
+    }
+
+    /**
+     * Renders the UI based on the synchronized PSCP state.
+     * @param {object} state - The current PSCP state object from Supabase.
+     */
+    function renderDashboard(state) {
+        const phaseText = document.getElementById('current-status-text');
+        const statusDot = document.getElementById('status-dot');
+        const statusSelect = document.getElementById('status-select');
+        const checklistContainer = document.getElementById('checklist-container');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+
+        // --- Render Status Indicator ---
+        phaseText.textContent = state.phase;
+        statusSelect.value = state.phase;
+
+        let dotColor = 'bg-gray-400';
+        switch (state.phase) {
+            case 'Pre-Disaster': dotColor = 'bg-green-500'; break;
+            case 'Alert': dotColor = 'bg-yellow-500 animate-pulse'; break;
+            case 'Activation': dotColor = 'bg-red-600 animate-ping-slow'; break;
+            case 'Recovery': dotColor = 'bg-blue-500'; break;
+            case 'Cessation': dotColor = 'bg-green-700'; break;
+        }
+        statusDot.className = `w-4 h-4 rounded-full shadow-lg ${dotColor}`;
+
+        // --- Render Checklist ---
+        checklistContainer.innerHTML = '';
+        // FIX: Using the 'tasks' property again
+        const tasks = state.tasks || [];
+        const completedTasks = tasks.filter(t => t.completed).length;
+        const totalTasks = tasks.length;
+        const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+        progressBar.style.width = `${progress}%`;
+        progressText.textContent = `Progress: ${completedTasks}/${totalTasks} tasks (${progress}%)`;
+
+        if (totalTasks === 0) {
+            checklistContainer.innerHTML = '<p class="text-gray-500">No recovery tasks defined.</p>';
+        }
+
+        tasks.forEach(task => {
+            const taskId = `task-${task.id}`;
+            const taskDiv = document.createElement('div');
+            // Using a simple click handler on the div itself to ensure task toggling works even if the input is missed
+            taskDiv.className = `flex items-center p-3 rounded-lg cursor-pointer transition duration-150 ${task.completed ? 'bg-green-50 border-l-4 border-green-500 line-through text-gray-500' : 'bg-white border border-gray-200 hover:bg-indigo-50'}`;
+            taskDiv.innerHTML = `
+                <input type="checkbox" id="${taskId}" data-task-id="${task.id}" ${task.completed ? 'checked' : ''} class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 pointer-events-none">
+                <label for="${taskId}" class="ml-3 block text-sm font-medium ${task.completed ? 'text-gray-500' : 'text-gray-900'}">${task.text}</label>
+            `;
+            checklistContainer.appendChild(taskDiv);
+
+            // Use the data from the state, as the event listener needs the current list of tasks
+            taskDiv.addEventListener('click', () => {
+                const newStatus = !task.completed;
+                // Pass the current tasks for the update function
+                handleTaskToggle(task.id, newStatus, tasks);
+            });
+        });
+    }
+
+    // --- 4. DATA UPDATES ---
+
+    /**
+     * Updates the PSCP Phase in Supabase.
+     * @param {string} newPhase - The new phase value.
+     */
+    async function updatePhase(newPhase) {
+        if (!supabase) return appendLog("Supabase client not initialized.", 'text-yellow-600');
+        try {
+            const { error } = await supabase
+                .from(PSCP_TABLE_NAME)
+                .update({ phase: newPhase })
+                .eq('id', PSCP_RECORD_ID);
+                
+            if (error) throw error;
+            appendLog(`Updated phase to ${newPhase}. Waiting for Realtime confirmation...`, 'text-indigo-600');
+        } catch (error) {
+            console.error("Supabase Update Error:", error);
+            appendLog(`Failed to update phase: ${error.message}`, 'text-red-500');
+        }
+    }
+
+    /**
+     * Toggles the completion status of a checklist task and updates Supabase.
+     * @param {string} taskId - The ID of the task to toggle.
+     * @param {boolean} isCompleted - The new completion status.
+     * @param {Array<object>} currentTasks - The current list of tasks.
+     */
+    async function handleTaskToggle(taskId, isCompleted, currentTasks) {
+        if (!supabase) return appendLog("Supabase client not initialized.", 'text-yellow-600');
+
+        // Create the updated tasks array
+        const newTasks = currentTasks.map(task =>
+            task.id === taskId ? { ...task, completed: isCompleted } : task
+        );
+
+        try {
+            const { error } = await supabase
+                .from(PSCP_TABLE_NAME)
+                // FIX: Reverting to 'tasks' column name
+                .update({ tasks: newTasks }) 
+                .eq('id', PSCP_RECORD_ID);
+
+            if (error) throw error;
+            appendLog(`Task ${taskId} set to ${isCompleted ? 'Completed' : 'Pending'}. Waiting for Realtime confirmation...`, 'text-green-600');
+        } catch (error) {
+            console.error("Supabase Task Update Error:", error);
+            // This error will still show if the 'tasks' column is missing, but the app won't crash on startup now.
+            appendLog(`Failed to update task: ${error.message}. Please check if the 'tasks' column (JSONB) exists in your DB.`, 'text-red-500');
+        }
+    }
+
+    // --- 5. EVENT LISTENERS AND STARTUP ---
+
+    // Listen for phase change on the dropdown
+    document.getElementById('status-select').addEventListener('change', (e) => {
+        updatePhase(e.target.value);
+    });
+
+    // Start the application after the window loads
+    window.onload = initializeSupabase;
+</script>
+
+</body>
+</html>
