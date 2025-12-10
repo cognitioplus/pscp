@@ -135,15 +135,6 @@
             color: var(--color-primary) !important; /* Ensure icon is primary blue */
         }
         
-        /* Mobile Menu Button - Light Style */
-        #mobile-menu-btn {
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            background-color: var(--color-context);
-        }
-        #mobile-menu-btn:hover {
-            background-color: #e5e7eb;
-        }
-        
         /* Header Title Font - Montserrat */
         .header-title {
             font-family: 'Montserrat', sans-serif;
@@ -193,17 +184,10 @@
     <!-- Backdrop for Mobile Sidebar -->
     <div id="backdrop" class="backdrop-overlay" onclick="toggleMobileMenu()"></div>
 
-    <!-- Mobile Menu Button -->
-    <button id="mobile-menu-btn" class="md:hidden fixed top-4 right-4 z-50 p-3 rounded-full border-2 border-gray-300 text-primary transition-colors">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
-    </button>
 
     <!-- Sidebar Navigation (Fixed on Desktop) -->
     <aside id="sidebar" class="bg-gray-100 text-gray-700 w-64 flex-shrink-0 flex flex-col transition-transform duration-300 transform -translate-x-full md:translate-x-0 fixed md:sticky top-0 h-full z-40 border-r border-gray-300 shadow-lg">
-        <div class="p-6 border-b border-gray-300 bg-white shadow-md">
-            <h3 class="text-3xl header-title tracking-widest text-primary">PSCP IRA<span class="text-secondary"></span></h3>
-            <p class="text-xs text-gray-500 mt-1 font-sans">v1.1.2 - Active Session</p>
-        </div>
+    
         
         <nav class="flex-1 overflow-y-auto py-4">
             <ul class="space-y-1">
