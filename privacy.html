@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DDRiVE-M Platform: Privacy Policy Explorer</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9; /* Slate 100 */
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e2e8f0;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        /* Chart Container Styling - MANDATORY */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px; /* Base height */
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        /* Transitions & Animations */
+        .fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-in {
+            animation: slideIn 0.3s ease-out forwards;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .card-interaction {
+            transition: all 0.2s ease;
+        }
+        .card-interaction:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Custom Tab Styling */
+        .tab-btn.active {
+            background-color: white;
+            color: #0f172a; /* Slate 900 */
+            border-bottom: 3px solid #0ea5e9; /* Sky 500 */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .tab-btn.inactive {
+            color: #64748b; /* Slate 500 */
+        }
+        .tab-btn.inactive:hover {
+            color: #334155; /* Slate 700 */
+            background-color: #f8fafc;
+        }
+    </style>
+
+    <!-- Chosen Palette: Trust & Security (Sky Blue, Slate Gray, Emerald Green, White) -->
+    <!-- Application Structure Plan:
+         1. **Header:** Trust indicators, Effective Date, Contact Info.
+         2. **Navigation:** Functional tabs: 'Overview', 'Data Collected', 'Usage & Security', 'Your Rights'.
+         3. **Overview Dashboard:** Summary cards (No Data Sold, User Owned) + Timeline of Policy.
+         4. **Data Collected Section:** Interactive visuals categorizing Account vs User vs Technical data.
+         5. **Usage & Security Section:**
+            - Chart.js Pie Chart showing the purpose of data usage (Service vs Security vs Improvement).
+            - Visual representation of Security layers.
+         6. **Your Rights Section:** Interactive grid of cards detailing User Rights (Access, Correction, etc.) with actions.
+         7. **Footer:** Quick links and formal closure.
+         
+         RATIONALE: Privacy policies are dense. This structure breaks it into "What we take," "What we do with it," and "What you can do," which matches the user's mental model of privacy.
+    -->
+
+    <!-- Visualization & Content Choices:
+         1. **Data Usage Distribution (Pie Chart):** Goal: Inform/Proportion. Visualizes Section 2. Shows that primary use is Service Delivery, not marketing. Interaction: Hover to see explanation.
+         2. **Security Layers (Styled List/Visual):** Goal: Inform. Visualizes Section 5.
+         3. **Rights Grid (Interactive Cards):** Goal: Organize/Action. Visualizes Section 7.
+         
+         CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    -->
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col">
+
+    <!-- App Wrapper -->
+    <div id="app" class="flex-grow w-full max-w-6xl mx-auto md:p-6 lg:p-8">
+        
+        <!-- Main Card Container -->
+        <div class="bg-white rounded-xl shadow-2xl overflow-hidden min-h-[80vh] flex flex-col border border-slate-200">
+            
+            <!-- Header -->
+            <header class="bg-slate-900 text-white p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-700">
+                <div>
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="text-2xl">🛡️</span>
+                        <h1 class="text-2xl md:text-3xl font-bold tracking-tight">DDRiVE-M Trust Center</h1>
+                    </div>
+                    <p class="text-slate-400 text-sm">Privacy Policy & Data Protection Explorer</p>
+                </div>
+                <div class="mt-4 md:mt-0 text-right">
+                    <div class="inline-flex items-center px-3 py-1 bg-emerald-900/50 text-emerald-400 text-xs font-semibold rounded-full border border-emerald-700/50 mb-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
+                        Status: ACTIVE
+                    </div>
+                    <p class="text-xs text-slate-500">Effective: December 11, 2025</p>
+                </div>
+            </header>
+
+            <!-- Navigation Tabs -->
+            <nav class="bg-slate-100 px-4 pt-4 border-b border-slate-200 overflow-x-auto">
+                <div class="flex space-x-2 min-w-max" id="nav-container">
+                    <!-- Nav items injected by JS -->
+                </div>
+            </nav>
+
+            <!-- Dynamic Content Area -->
+            <main id="main-content" class="flex-grow p-6 md:p-10 bg-slate-50/50 relative">
+                <!-- Content injected here -->
+            </main>
+
+            <!-- Footer -->
+            <footer class="bg-white border-t border-slate-200 p-6 md:px-10 text-center md:text-left flex flex-col md:flex-row justify-between items-center text-sm text-slate-500">
+                <div>
+                    <p>© 2025 DDRiVE-M Platform. All rights reserved.</p>
+                </div>
+                <div class="mt-2 md:mt-0 flex items-center gap-4">
+                    <span class="flex items-center gap-1">📧 <a href="mailto:hello@cognitioplus.com" class="text-sky-600 hover:underline font-medium">hello@cognitioplus.com</a></span>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- Data Store ---
+        const privacyData = {
+            overview: {
+                intro: "The DDRiVE-M Platform is a specialized tool for Public Service Continuity Planning (PSCP). We are committed to protecting the sensitive data of government agencies.",
+                highlights: [
+                    { label: "Data Ownership", value: "You (Agency)", icon: "🏛️", desc: "You retain full IP rights to your data." },
+                    { label: "Data Sales", value: "0%", icon: "🚫", desc: "We never sell or rent your data." },
+                    { label: "Security", value: "Encrypted", icon: "🔒", desc: "Industry-standard protection." }
+                ]
+            },
+            collection: [
+                {
+                    title: "1.1 Registration Data",
+                    icon: "👤",
+                    items: ["Official Name & Job Title", "Government Agency Name", "Official Email Address", "Encrypted Credentials"]
+                },
+                {
+                    title: "1.2 User Data (Yours)",
+                    icon: "📑",
+                    items: ["BIA Results & RTO/RPO", "Risk Scores & Registers", "Continuity Plans (PSCP)", "Mitigation Strategies"]
+                },
+                {
+                    title: "1.3 Technical Data",
+                    icon: "💻",
+                    items: ["IP Address & Logs", "Device Identifiers", "Session Cookies", "Usage Metrics"]
+                }
+            ],
+            usage: {
+                categories: [
+                    { label: 'Service Delivery', value: 45, color: '#0ea5e9', desc: 'Executing risk algorithms, generating reports, giving access.' }, // Sky 500
+                    { label: 'Security & Integrity', value: 25, color: '#10b981', desc: 'Verifying identity, fraud prevention, protocol enforcement.' }, // Emerald 500
+                    { label: 'Platform Improvement', value: 20, color: '#6366f1', desc: 'Aggregated analysis to improve accuracy and UI.' }, // Indigo 500
+                    { label: 'Communication', value: 10, color: '#f59e0b', desc: 'Sending alerts, updates, and service notifications.' }  // Amber 500
+                ],
+                sharing: [
+                    { entity: "Service Providers", detail: "Cloud hosting & backup (bound by confidentiality)." },
+                    { entity: "Legal Compliance", detail: "Subpoenas or government mandates." },
+                    { entity: "Platform Admins", detail: "For maintenance and technical support only." }
+                ]
+            },
+            rights: [
+                { id: 'access', title: 'Access', icon: '👁️', desc: 'Request copies of personal data we hold about you.' },
+                { id: 'correct', title: 'Correction', icon: '✏️', desc: 'Request correction of incomplete or inaccurate data.' },
+                { id: 'delete', title: 'Deletion', icon: '🗑️', desc: 'Request deletion of data (subject to legal retention mandates).' },
+                { id: 'withdraw', title: 'Withdraw Consent', icon: '🛑', desc: 'Revoke consent for specific processing activities.' }
+            ]
+        };
+
+        // --- State ---
+        let currentState = 'overview';
+
+        // --- Tabs Config ---
+        const tabs = [
+            { id: 'overview', label: 'Overview' },
+            { id: 'collection', label: '1. Data Collected' },
+            { id: 'usage', label: '2. Usage & Security' },
+            { id: 'rights', label: '3. Your Rights' }
+        ];
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderNav();
+            renderView('overview');
+        });
+
+        // --- Navigation Logic ---
+        function renderNav() {
+            const container = document.getElementById('nav-container');
+            container.innerHTML = tabs.map(tab => `
+                <button 
+                    onclick="switchTab('${tab.id}')" 
+                    class="tab-btn px-6 py-3 text-sm font-semibold rounded-t-lg transition-all duration-200 whitespace-nowrap ${currentState === tab.id ? 'active' : 'inactive'}"
+                >
+                    ${tab.label}
+                </button>
+            `).join('');
+        }
+
+        function switchTab(id) {
+            currentState = id;
+            renderNav();
+            renderView(id);
+        }
+
+        // --- View Rendering ---
+        function renderView(id) {
+            const main = document.getElementById('main-content');
+            
+            // Trigger Fade Out/In
+            main.innerHTML = '';
+            main.classList.remove('fade-in');
+            void main.offsetWidth; 
+            main.classList.add('fade-in');
+
+            switch(id) {
+                case 'overview': renderOverview(main); break;
+                case 'collection': renderCollection(main); break;
+                case 'usage': renderUsage(main); break;
+                case 'rights': renderRights(main); break;
+            }
+        }
+
+        // --- Section Renderers ---
+
+        function renderOverview(container) {
+            container.innerHTML = `
+                <div class="max-w-4xl mx-auto">
+                    <div class="mb-8 text-center">
+                        <h2 class="text-3xl font-bold text-slate-800 mb-4">Your Data, Your Mission.</h2>
+                        <p class="text-lg text-slate-600 leading-relaxed">${privacyData.overview.intro}</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                        ${privacyData.overview.highlights.map(item => `
+                            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm text-center card-interaction">
+                                <div class="text-4xl mb-3">${item.icon}</div>
+                                <div class="text-sm font-bold text-slate-500 uppercase tracking-wide">${item.label}</div>
+                                <div class="text-2xl font-bold text-slate-900 my-1">${item.value}</div>
+                                <div class="text-xs text-slate-400">${item.desc}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div class="bg-sky-50 border border-sky-100 rounded-lg p-6 flex items-start gap-4">
+                        <span class="text-2xl">💡</span>
+                        <div>
+                            <h3 class="font-bold text-sky-900 mb-1">Core Principle: Confidentiality</h3>
+                            <p class="text-sky-800 text-sm">
+                                Due to the nature of Public Service Continuity Planning, all User Data is treated as strictly confidential. We act strictly as a data processor; you (the Agency) act as the controller/owner.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderCollection(container) {
+            container.innerHTML = `
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-slate-900">1. Information We Collect</h2>
+                    <p class="text-slate-500 mt-2">We only collect what is necessary to facilitate risk analysis and maintain account security.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    ${privacyData.collection.map((col, index) => `
+                        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden card-interaction" style="animation-delay: ${index * 100}ms">
+                            <div class="bg-slate-50 p-4 border-b border-slate-100 flex items-center justify-between">
+                                <h3 class="font-bold text-slate-800">${col.title}</h3>
+                                <span class="text-2xl">${col.icon}</span>
+                            </div>
+                            <div class="p-5">
+                                <ul class="space-y-3">
+                                    ${col.items.map(item => `
+                                        <li class="flex items-start text-sm text-slate-600">
+                                            <span class="text-emerald-500 mr-2">✓</span>
+                                            ${item}
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="mt-8 text-center text-xs text-slate-400">
+                    See Privacy Policy Section 1.1 - 1.3 for full details.
+                </div>
+            `;
+        }
+
+        function renderUsage(container) {
+            container.innerHTML = `
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                    
+                    <!-- Chart Section -->
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                        <h2 class="text-xl font-bold text-slate-900 mb-2">2. How We Use Information</h2>
+                        <p class="text-xs text-slate-500 mb-6">Proportional breakdown of data usage purposes.</p>
+                        
+                        <div class="chart-container">
+                            <canvas id="usageChart"></canvas>
+                        </div>
+                        
+                        <div class="mt-6 grid grid-cols-2 gap-2">
+                            ${privacyData.usage.categories.map(cat => `
+                                <div class="flex items-center gap-2 text-xs text-slate-600">
+                                    <span class="w-3 h-3 rounded-full" style="background-color: ${cat.color}"></span>
+                                    <span>${cat.label}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Security & Sharing Section -->
+                    <div class="flex flex-col space-y-8">
+                        
+                        <!-- Disclosure -->
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-900 mb-4">4. Sharing & Disclosure</h2>
+                            <div class="space-y-3">
+                                ${privacyData.usage.sharing.map(share => `
+                                    <div class="bg-white p-4 rounded-lg border-l-4 border-slate-300 shadow-sm">
+                                        <div class="font-bold text-slate-800 text-sm">${share.entity}</div>
+                                        <div class="text-xs text-slate-500">${share.detail}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="mt-2 text-xs text-emerald-600 font-bold flex items-center">
+                                <span class="mr-1">🛡️</span> WE DO NOT SELL OR RENT USER DATA.
+                            </div>
+                        </div>
+
+                        <!-- Security -->
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-900 mb-4">5. Data Security Measures</h2>
+                            <div class="bg-slate-800 text-white rounded-xl p-6 relative overflow-hidden">
+                                <div class="relative z-10 space-y-4">
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-emerald-400 text-xl">🔒</span>
+                                        <div>
+                                            <h4 class="font-bold text-sm">Encryption</h4>
+                                            <p class="text-xs text-slate-400">Data encrypted at rest and in transit.</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-emerald-400 text-xl">🛂</span>
+                                        <div>
+                                            <h4 class="font-bold text-sm">Access Control</h4>
+                                            <p class="text-xs text-slate-400">Strict role-based access for admins.</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-emerald-400 text-xl">📋</span>
+                                        <div>
+                                            <h4 class="font-bold text-sm">Regular Audits</h4>
+                                            <p class="text-xs text-slate-400">Security checks against unauthorized access.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Decor -->
+                                <div class="absolute -right-6 -bottom-6 text-9xl text-slate-700 opacity-20">🛡️</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            `;
+
+            // Initialize Chart after DOM update
+            setTimeout(initUsageChart, 50);
+        }
+
+        function initUsageChart() {
+            const ctx = document.getElementById('usageChart');
+            if (!ctx) return;
+
+            new Chart(ctx.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: privacyData.usage.categories.map(c => c.label),
+                    datasets: [{
+                        data: privacyData.usage.categories.map(c => c.value),
+                        backgroundColor: privacyData.usage.categories.map(c => c.color),
+                        borderWidth: 0,
+                        hoverOffset: 15
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: {
+                        legend: { display: false }, // Custom legend used
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const index = context.dataIndex;
+                                    return privacyData.usage.categories[index].desc;
+                                }
+                            },
+                            backgroundColor: '#1e293b',
+                            padding: 12,
+                            bodyFont: { size: 12 }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderRights(container) {
+            container.innerHTML = `
+                <div class="max-w-5xl mx-auto">
+                    <div class="mb-8 text-center">
+                        <h2 class="text-2xl font-bold text-slate-900">7. Your User Rights</h2>
+                        <p class="text-slate-500">You retain control. Here is how you can exercise your rights.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        ${privacyData.rights.map(right => `
+                            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:border-sky-300 transition-colors group">
+                                <div class="flex items-start justify-between mb-4">
+                                    <h3 class="font-bold text-lg text-slate-800 group-hover:text-sky-600">${right.title}</h3>
+                                    <span class="text-3xl grayscale group-hover:grayscale-0 transition-all">${right.icon}</span>
+                                </div>
+                                <p class="text-sm text-slate-600 mb-6 min-h-[40px]">${right.desc}</p>
+                                <button onclick="contactSupport('${right.title}')" class="w-full py-2 rounded-lg bg-slate-50 text-slate-600 text-sm font-semibold hover:bg-sky-50 hover:text-sky-600 border border-slate-200 hover:border-sky-200 transition-all">
+                                    Exercise this Right
+                                </button>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div class="mt-10 bg-amber-50 border border-amber-100 p-6 rounded-lg text-center">
+                        <h4 class="font-bold text-amber-800 mb-2">Note on Data Deletion</h4>
+                        <p class="text-sm text-amber-700 max-w-2xl mx-auto">
+                            Deletion requests are subject to applicable legal retention mandates, which is especially relevant for government records. We will securely delete or anonymize data unless retention is legally required.
+                        </p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function contactSupport(subject) {
+            alert(`To exercise your right to "${subject}", please contact our Data Protection Officer at hello@cognitioplus.com`);
+        }
+
+    </script>
+</body>
+</html>
