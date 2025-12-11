@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DDRiVE-M PSCP FAQ</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles for PWA feel */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7fafc; /* Light gray background */
+            scroll-behavior: smooth;
+        }
+        .container-main {
+            max-width: 800px;
+        }
+        .faq-item {
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .question-button {
+            transition: color 0.15s ease-in-out;
+        }
+        .answer-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-in-out, padding 0.4s ease-in-out;
+        }
+        .answer-content.open {
+            max-height: 500px; /* Large enough value to cover content */
+            padding-bottom: 1.5rem;
+        }
+        .rotate-180 {
+            transform: rotate(180deg);
+        }
+        .transition-transform {
+            transition: transform 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+
+    <div id="app" class="container-main mx-auto shadow-xl rounded-2xl bg-white">
+        <!-- Header -->
+        <header class="bg-indigo-700 text-white p-6 md:p-8 rounded-t-2xl">
+            <h1 class="text-3xl font-bold tracking-tight">DDRiVE-M PSCP FAQ</h1>
+            <p class="text-indigo-200 mt-1 text-sm md:text-base">Understanding the Public Service Continuity Plan Framework</p>
+        </header>
+
+        <!-- FAQ Content Sections -->
+        <main class="p-4 md:p-8">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-6">Frequently Asked Questions</h2>
+
+            <div id="faq-list">
+                <!-- I. General Overview -->
+                <h3 class="text-xl font-bold text-indigo-700 border-b-2 border-indigo-200 pb-2 mt-8 mb-4">I. General Overview</h3>
+                <div class="faq-item">
+                    <button class="question-button w-full flex justify-between items-center py-4 text-left font-semibold text-gray-700 hover:text-indigo-600 focus:outline-none" data-target="q1">
+                        1. What is the DDRiVE-M Platform?
+                        <svg class="transition-transform transform h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div id="q1" class="answer-content">
+                        <p class="text-gray-600">The Data-Driven Risk and Vulnerability Evaluation and Management (DDRiVE-M) Platform is a tool and framework designed to promote **Public Service Continuity (PSCP)** for government agencies. It facilitates the planning, analysis, and activation of protocols to ensure essential services continue to be delivered during and after a disruptive incident.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="question-button w-full flex justify-between items-center py-4 text-left font-semibold text-gray-700 hover:text-indigo-600 focus:outline-none" data-target="q2">
+                        2. What is the primary focus of the DDRiVE-M Platform?
+                        <svg class="transition-transform transform h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div id="q2" class="answer-content">
+                        <p class="text-gray-600">The platform focuses on **Public Service Continuity (PSCP)**, which is the organization's ability to perform its legal mandate when a disaster strikes. This differs from standard emergency response, which typically focuses on saving lives and property.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="question-button w-full flex justify-between items-center py-4 text-left font-semibold text-gray-700 hover:text-indigo-600 focus:outline-none" data-target="q3">
+                        3. What standards and frameworks does the DDRiVE-M Platform comply with?
+                        <svg class="transition-transform transform h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div id="q3" class="answer-content">
+                        <p class="text-gray-600">The DDRiVE-M is compliant with both **ISO (International Organization for Standardization)** and **Philippine Frameworks** in Risk Management.</p>
+                    </div>
+                </div>
+
+                <!-- II. Planning and Analysis -->
+                <h3 class="text-xl font-bold text-indigo-700 border-b-2 border-indigo-200 pb-2 mt-8 mb-4">II. Planning and Analysis</h3>
+                
+                <div class="faq-item">
+                    <button class="question-button w-full flex justify-between items-center py-4 text-left font-semibold text-gray-700 hover:text-indigo-600 focus:outline-none" data-target="q4">
+                        4. What are the three core components of the PSCP process?
+                        <svg class="transition-transform transform h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div id="q4" class="answer-content">
+                        <p class="text-gray-600">The process is broken down into three main phases:</p>
+                        <ul class="list-disc list-inside mt-2 ml-4 text-gray-600 space-y-1">
+                            <li><strong class="text-indigo-600">Policy & Objective:</strong> Establishing the continuity policy, scope, and objectives.</li>
+                            <li><strong class="text-indigo-600">Risk & Impact Analysis:</strong> Identifying essential functions and assessing potential threats through Risk Assessment and Business Impact Analysis (BIA).</li>
+                            <li><strong class="text-indigo-600">Response & Recovery:</strong> Developing strategies and procedures to restore services within the defined Recovery Time Objective (RTO).</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <button class="question-button w-full flex justify-between items-center py-4 text-left font-semibold text-gray-700 hover:text-indigo-600 focus:outline-none" data-target="q5">
+                        5. What is the difference between RTO and RPO?
+                        <svg class="transition-transform transform h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div id="q5" class="answer-content">
+                        <p class="text-gray-600">
+                            <strong class="text-indigo-600">RTO (Recovery Time Objective):</strong> This is the maximum time a critical service can be down following a disruption before the agency experiences unacceptable consequences. Shorter RTOs indicate higher urgency.
+                        </p>
+                        <p class="text-gray-600 mt-2">
+                            <strong class="text-indigo-600">RPO (Recovery Point Objective):</strong> This defines how much data loss is acceptable, typically measured in time (e.g., 1 hour of data loss).
+                        </p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="question-button w-full flex justify-between items-center py-4 text-left font-semibold text-gray-700 hover:text-indigo-600 focus:outline-none" data-target="q6">
+                        6. What is the purpose of the Risk Assessment Matrix?
+                        <svg class="transition-transform transform h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div id="q6" class="answer-content">
+                        <p class="text-gray-600">
+                            The Risk Assessment Matrix helps visualize the **Likelihood vs. Impact** of potential hazards. Any hazard plotted in the **High Impact + High Likelihood (Top Right)** quadrant requires immediate mitigation strategies. [Image of Risk Assessment Matrix]
+                        </p>
+                    </div>
+                </div>
+
+                <!-- III. Continuity Strategies -->
+                <h3 class="text-xl font-bold text-indigo-700 border-b-2 border-indigo-200 pb-2 mt-8 mb-4">III. Continuity Strategies</h3>
+
+                <div class="faq-item">
+                    <button class="question-button w-full flex justify-between items-center py-4 text-left font-semibold text-gray-700 hover:text-indigo-600 focus:outline-none" data-target="q7">
+                        7. What are the main types of Alternate Sites used in continuity planning?
+                        <svg class="transition-transform transform h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div id="q7" class="answer-content">
+                        <p class="text-gray-600">Alternate sites are designated locations to relocate critical staff and operations if the primary facility is unavailable. They include:</p>
+                        <ul class="list-disc list-inside mt-2 ml-4 text-gray-600 space-y-1">
+                            <li><strong class="text-indigo-600">Hot Site:</strong> Fully equipped and ready for immediate use.</li>
+                            <li><strong class="text-indigo-600">Warm Site:</strong> Partially equipped, requiring some preparation time.</li>
+                            <li><strong class="text-indigo-600">Cold Site:</strong> Space only, requiring significant time and resources to become operational.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="question-button w-full flex justify-between items-center py-4 text-left font-semibold text-gray-700 hover:text-indigo-600 focus:outline-none" data-target="q8">
+                        8. What is the "3-2-1 Rule" for vital records protection?
+                        <svg class="transition-transform transform h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div id="q8" class="answer-content">
+                        <p class="text-gray-600">The 3-2-1 Rule is a best practice for data backup and protection of essential documents, stating you should have:</p>
+                        <ul class="list-disc list-inside mt-2 ml-4 text-gray-600 space-y-1">
+                            <li><strong class="text-indigo-600">3</strong> Copies of your data.</li>
+                            <li><strong class="text-indigo-600">2</strong> Different media types (e.g., hard drive and cloud storage).</li>
+                            <li><strong class="text-indigo-600">1</strong> Off-site location (a separate geographical location).</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- IV. Governance and Activation -->
+                <h3 class="text-xl font-bold text-indigo-700 border-b-2 border-indigo-200 pb-2 mt-8 mb-4">IV. Governance and Activation</h3>
+
+                <div class="faq-item">
+                    <button class="question-button w-full flex justify-between items-center py-4 text-left font-semibold text-gray-700 hover:text-indigo-600 focus:outline-none" data-target="q9">
+                        9. Who is responsible for leading the PSCP during a crisis?
+                        <svg class="transition-transform transform h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div id="q9" class="answer-content">
+                        <p class="text-gray-600">The **Continuity Management Team (CMT)** is the decision-making body during a crisis.  Key roles within the CMT typically include:</p>
+                        <ul class="list-disc list-inside mt-2 ml-4 text-gray-600 space-y-1">
+                            <li>CMT Leader (Head of Agency)</li>
+                            <li>Operations Lead (Service Recovery)</li>
+                            <li>Logistics Lead (Resources & Sites)</li>
+                            <li>Comms & IT Lead (Information & Technology)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="question-button w-full flex justify-between items-center py-4 text-left font-semibold text-gray-700 hover:text-indigo-600 focus:outline-none" data-target="q10">
+                        10. What are the activation status levels for the PSCP?
+                        <svg class="transition-transform transform h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div id="q10" class="answer-content">
+                        <p class="text-gray-600">The platform uses four status levels to indicate the severity of a disruptive incident:</p>
+                        <ul class="list-disc list-inside mt-2 ml-4 text-gray-600 space-y-1">
+                            <li><span class="text-green-500 font-bold">🟢</span> Normal Operations</li>
+                            <li><span class="text-yellow-500 font-bold">🟡</span> Level 1 (Minor)</li>
+                            <li><span class="text-orange-500 font-bold">🟠</span> Level 2 (Moderate)</li>
+                            <li><span class="text-red-500 font-bold">🔴</span> Level 3 (Major)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="question-button w-full flex justify-between items-center py-4 text-left font-semibold text-gray-700 hover:text-indigo-600 focus:outline-none" data-target="q11">
+                        11. What is the high-level flow of the Activation Protocol?
+                        <svg class="transition-transform transform h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div id="q11" class="answer-content">
+                        <p class="text-gray-600">The Activation Protocol details the procedures for the initial hours of a disruptive incident.  The key steps are:</p>
+                        <ol class="list-decimal list-inside mt-2 ml-4 text-gray-600 space-y-1">
+                            <li>**Incident Detection:** Security or staff reports an anomaly.</li>
+                            <li>**Initial Assessment:** The CMT determines the impact level.</li>
+                            <li>**Activation Decision:** The Head of Agency formally activates the PSCP.</li>
+                            <li>**Notification:** Call trees and communication plans are initiated.</li>
+                            <li>**Relocation:** Critical personnel move to the Alternate Site, if necessary.</li>
+                        </ol>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-gray-100 p-6 md:p-8 rounded-b-2xl text-center text-sm text-gray-500">
+            <p>&copy; 2025 DDRiVE-M PSCP FAQ. Information based on the official dashboard content.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const buttons = document.querySelectorAll('.question-button');
+
+            buttons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetId = button.getAttribute('data-target');
+                    const answer = document.getElementById(targetId);
+                    const arrow = button.querySelector('svg');
+
+                    // Close all other open answers
+                    document.querySelectorAll('.answer-content.open').forEach(openAnswer => {
+                        if (openAnswer.id !== targetId) {
+                            openAnswer.classList.remove('open');
+                            openAnswer.previousElementSibling.querySelector('svg').classList.remove('rotate-180');
+                        }
+                    });
+
+                    // Toggle the clicked answer
+                    answer.classList.toggle('open');
+                    arrow.classList.toggle('rotate-180');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
