@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About DDRiVE-M: Public Service Continuity</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9; /* Slate 100 */
+        }
+        
+        .step-card {
+            transition: all 0.3s ease;
+        }
+        .step-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(14, 165, 233, 0.2), 0 4px 6px -2px rgba(14, 165, 233, 0.1);
+        }
+        .step-card.active {
+            border-left-width: 4px;
+            border-color: #0ea5e9; /* Sky 500 */
+            background-color: #e0f2fe; /* Sky 100 */
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 350px;
+        }
+
+        .faq-question {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out, padding 0.4s ease-out;
+        }
+        .faq-answer.open {
+            max-height: 500px; /* Arbitrary large value for smooth transition */
+            padding-top: 0.75rem;
+            padding-bottom: 1rem;
+        }
+        .chevron {
+            transition: transform 0.3s;
+        }
+        .chevron.rotated {
+            transform: rotate(180deg);
+        }
+
+        .scroll-snap-container {
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+        .scroll-snap-item {
+            scroll-snap-align: start;
+            flex: 0 0 100%;
+        }
+    </style>
+
+    <!-- Chosen Palette: Public Trust (Sky Blue, Slate Gray, Neutral Backgrounds) -->
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col">
+
+    <!-- App Wrapper -->
+    <div id="app" class="flex-grow w-full max-w-7xl mx-auto p-4 md:p-6 lg:p-8">
+        
+        <!-- Main Application Card -->
+        <div class="bg-white rounded-xl shadow-2xl overflow-hidden min-h-[90vh] border border-slate-200">
+            
+            <!-- Header -->
+            <header class="bg-slate-900 text-white p-8 md:p-12 flex flex-col justify-center items-center text-center">
+                <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight mb-3">DDRiVE-M Platform</h1>
+                <!-- Added full name of acronym -->
+                <p class="text-slate-400 text-sm md:text-base font-light mb-2">
+                    Data-Driven Risk & Vulnerability Evaluation and Management - PSCP-Focused
+                </p>
+                <p class="text-sky-400 text-lg md:text-xl font-medium">Public Service Continuity, Reimagined.</p>
+                <div class="mt-4 max-w-3xl text-slate-300 text-sm md:text-base">
+                    <!-- Updated Description: Emphasis on Guidebook and RA 12287 -->
+                    The DDRiVE-M (PSCP version) is meticulously aligned with the **Second and Latest PSCP Guidebook** and integrates statutory requirements like **RA 12287 (Anticipatory Actions)**, providing government agencies with a structured, data-driven framework for developing, validating, and maintaining robust Public Service Continuity Plans (PSCPs).
+                </div>
+            </header>
+
+            <!-- Introduction & Pillars -->
+            <section class="p-6 md:p-10 border-b border-slate-100">
+                <h2 class="text-2xl font-bold text-slate-800 mb-6 text-center">Why DDRiVE-M?</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-slate-50 p-6 rounded-lg shadow-sm text-center">
+                        <span class="text-4xl block mb-3">💡</span>
+                        <h3 class="font-semibold text-lg mb-2">Data-Driven Analysis</h3>
+                        <p class="text-sm text-slate-600">Move beyond checklists with quantitative Business Impact Analysis (BIA) and integrated risk scoring.</p>
+                    </div>
+                    <div class="bg-slate-50 p-6 rounded-lg shadow-sm text-center">
+                        <span class="text-4xl block mb-3">⏱️</span>
+                        <h3 class="font-semibold text-lg mb-2">Optimized Recovery</h3>
+                        <p class="text-sm text-slate-600">Establish and track clear Recovery Time Objectives (RTO) and Recovery Point Objectives (RPO).</p>
+                    </div>
+                    <div class="bg-slate-50 p-6 rounded-lg shadow-sm text-center">
+                        <span class="text-4xl block mb-3">🛡️</span>
+                        <h3 class="font-semibold text-lg mb-2">Full Compliance</h3>
+                        <!-- Updated Compliance Detail -->
+                        <p class="text-sm text-slate-600">Meets mandates of the Second PSCP Guidebook and integrates statutory requirements like RA 12287 on Anticipatory Actions.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Methodology Explorer -->
+            <section class="p-6 md:p-10 grid grid-cols-1 lg:grid-cols-5 gap-8">
+                
+                <div class="lg:col-span-2">
+                    <h2 class="text-2xl font-bold text-slate-800 mb-6">The DDRiVE-M Methodology</h2>
+                    <p class="text-sm text-slate-600 mb-6">
+                        DDRiVE-M represents seven critical, interconnected phases necessary for a mature PSCP. Click on each step to view the objective and key activities.
+                    </p>
+                    
+                    <div id="methodology-list" class="space-y-2">
+                        <!-- Step Cards Injected by JS -->
+                    </div>
+                </div>
+
+                <div class="lg:col-span-3">
+                    <div id="methodology-detail" class="bg-white p-6 md:p-8 rounded-xl shadow-lg border border-sky-300/50 min-h-[400px]">
+                        <!-- Detail Content Injected by JS -->
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- Coverage Visualization -->
+            <section class="p-6 md:p-10 border-t border-slate-100 bg-slate-50/50">
+                <h2 class="text-2xl font-bold text-slate-800 mb-6 text-center">Methodology Coverage</h2>
+                <p class="text-sm text-slate-600 mb-8 max-w-3xl mx-auto text-center">
+                    The DDRiVE-M framework is comprehensive, balancing proactive risk mitigation with recovery strategies to ensure full continuity lifecycle management.
+                </p>
+                <div class="chart-container">
+                    <canvas id="coverageChart"></canvas>
+                </div>
+            </section>
+            
+            <!-- FAQ Section -->
+            <section class="p-6 md:p-10 border-t border-slate-100">
+                <h2 class="text-2xl font-bold text-slate-800 mb-6 text-center">📘 DDRiVE-M Platform FAQ</h2>
+                <div id="faq-container" class="max-w-4xl mx-auto">
+                    <!-- FAQ content will be inserted here by JS -->
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <footer class="bg-slate-900 border-t border-slate-700 p-6 text-center text-sm text-slate-500">
+                <p class="mb-2">For detailed information on data handling, please refer to our <a href="#" class="text-sky-400 hover:text-sky-300 underline">Privacy Policy</a>.</p>
+                <p>© 2025 DDRiVE-M Platform. Built for Resilience.</p>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        const methodology = [
+            { 
+                key: 'D', 
+                name: 'Detection', 
+                color: '#f59e0b', 
+                objective: 'Leverage AI and analytics to identify and prioritize potential threats and quantify risks.', 
+                activities: [
+                    'Threat Landscape Scanning', 
+                    'Vulnerability and Impact Assessment', 
+                    'Early Warning System Integration'
+                ],
+                tools: [
+                    'AI-Driven Threat Forecasting Models', 
+                    'Collaborative Real-time Assessment Dashboards', 
+                    'Predictive EWS Integration'
+                ] 
+            }, // Amber 500
+            { 
+                key: 'D', 
+                name: 'Deterrence', 
+                color: '#10b981', 
+                objective: 'Implement controls and anticipatory actions using data-driven insights to prevent or minimize impact.', 
+                activities: [
+                    'Preventative Control Mapping', 
+                    'Integration of RA 12287 Anticipatory Actions', 
+                    'Security Protocol Enforcement', 
+                    'Redundancy Planning'
+                ],
+                tools: [
+                    'Analytics-Driven Preventative Control Mapping', 
+                    'Collaborative Security Protocol Platforms', 
+                    'Smart Resource Pre-positioning Systems'
+                ] 
+            }, // Emerald 500
+            { 
+                key: 'R', 
+                name: 'Response', 
+                color: '#ef4444', 
+                objective: 'Activate immediate, analytics-guided actions to stabilize operations and minimize disruption.', 
+                activities: [
+                    'Incident Communication Protocol Activation', 
+                    'Damage Assessment and Triage', 
+                    'Critical Service Restoration'
+                ],
+                tools: [
+                    'AI-Powered Communication Protocol Generators', 
+                    'Real-time Damage Assessment via Collaborative Dashboards', 
+                    'Criticality Metric-Guided Triage Engines'
+                ] 
+            }, // Red 500
+            { 
+                key: 'i', 
+                name: 'Integration', 
+                color: '#6366f1', 
+                objective: 'Embed continuity requirements into agency strategy, utilizing collaborative planning tools for alignment.', 
+                activities: [
+                    'Mission Alignment Verification', 
+                    'Stakeholder Buy-in and Consultation', 
+                    'Policy and Regulatory Integration'
+                ],
+                tools: [
+                    'Digital Tracing and Alignment Verification Systems', 
+                    'Collaborative Document Co-creation & Version Control', 
+                    'Automated Compliance Checkers'
+                ] 
+            }, // Indigo 500
+            { 
+                key: 'V', 
+                name: 'Verification', 
+                color: '#0ea5e9', 
+                objective: 'Test, drill, and validate the PSCP effectiveness using data-rich simulation environments.', 
+                activities: [
+                    'Scenario-based Simulation Exercises', 
+                    'Lessons Learned Documentation', 
+                    'Gap Analysis and Remediation Planning'
+                ],
+                tools: [
+                    'Digital Twin Simulation Environments', 
+                    'Analytics-Driven After-Action Reporting', 
+                    'AI-Generated Gap Analysis and Optimization Suggestions'
+                ] 
+            }, // Sky 500
+            { 
+                key: 'E', 
+                name: 'Execution', 
+                color: '#f97316', 
+                objective: 'Formally deploy the tested and approved PSCP with integrated resource tracking and mobilization.', 
+                activities: [
+                    'Resource Allocation Confirmation', 
+                    'Training and Awareness Programs', 
+                    'Final Document Ratification and Deployment'
+                ],
+                tools: [
+                    'Real-time Resource/Personnel Tracking Platforms', 
+                    'Role-Specific E-Learning Modules', 
+                    'Digital Document Deployment and Access Control'
+                ] 
+            }, // Orange 500
+            { 
+                key: 'M', 
+                name: 'Monitoring', 
+                color: '#3b82f6', 
+                objective: 'Continuously review, update, and improve the plan using predictive analytics and feedback loops.', 
+                activities: [
+                    'Performance Metric Tracking', 
+                    'Change Management Integration', 
+                    'Annual Review Cycle and Benchmarking'
+                ],
+                tools: [
+                    'AI-Powered Performance Metric and Anomaly Detection', 
+                    'Automated Change Management Systems', 
+                    'Collaborative Benchmarking and Feedback Platforms'
+                ] 
+            } // Blue 500
+        ];
+
+        const faqData = [
+            { category: "General Overview", questions: [
+                { q: "What is the DDRiVE-M Platform?", a: "DDRiVE-M is an integrated risk management and command center platform designed to monitor assets, assess risks, and support resilience planning using ISO 31000 standards." },
+                { q: "Who uses DDRiVE-M?", a: "It is primarily used by local government units (LGUs), operators, and risk managers to centralize monitoring, planning, and response." }
+            ]},
+            { category: "Features & Capabilities", questions: [
+                { q: "What types of risks does DDRiVE-M monitor?", a: "The platform tracks vulnerabilities across multiple sectors, including flood, seismic, operational, and cyber risks." },
+                { q: "How many assets can DDRiVE-M monitor?", a: "Currently, the system monitors over 1,200 assets, with growth trends tracked monthly." },
+                { q: "What is the Resilience Score?", a: "A resilience score (e.g., 84/100) is generated based on ISO 31000 assessments to measure preparedness and risk exposure." },
+                { q: "Does DDRiVE-M support GIS mapping?", a: "Yes, the platform integrates GIS mapping for spatial risk visualization and asset tracking." },
+                { q: "Can DDRiVE-M generate plans?", a: "Yes, it includes a plan generator for disaster risk reduction and management (DRRM) plans, with pending approvals tracked in the dashboard." }
+            ]},
+            { category: "Alerts & Notifications", questions: [
+                { q: "What kind of alerts does DDRiVE-M provide?", a: "The system issues real-time alerts such as seismic activity detection, flood risk warnings, and operational system updates." },
+                { q: "How are alerts prioritized?", a: "Critical alerts are flagged for immediate action, while routine system checks (e.g., backups) are logged for monitoring." }
+            ]},
+            { category: "Collaboration & Reporting", questions: [
+                { q: "Does DDRiVE-M support collaboration?", a: "Yes, it features a collaboration hub for operators and stakeholders to coordinate responses." },
+                { q: "What reporting functions are available?", a: "The dashboard tracks pending reports, DRRM plan approvals, and risk exposure trends over time." }
+            ]},
+            { category: "Technical & Security", questions: [
+                { q: "How does DDRiVE-M ensure data reliability?", a: "The platform performs daily redundancy checks and system backups to maintain data integrity." },
+                { q: "Is DDRiVE-M compliant with international standards?", a: "Yes, it aligns with ISO 31000 risk management guidelines." }
+            ]}
+        ];
+
+        let activeStep = methodology[0].key + methodology[0].name;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderMethodologyList();
+            renderMethodologyDetail(methodology[0]);
+            initCoverageChart();
+            renderFAQ(); // New function call
+        });
+
+        function renderMethodologyList() {
+            const container = document.getElementById('methodology-list');
+            container.innerHTML = methodology.map(step => `
+                <div 
+                    id="step-${step.key}${step.name}"
+                    class="step-card p-4 rounded-lg cursor-pointer flex items-center gap-4 border border-slate-200 shadow-sm ${activeStep === step.key + step.name ? 'active' : 'bg-white'}"
+                    onclick="switchMethodologyStep('${step.key}${step.name}')"
+                >
+                    <span class="text-3xl font-bold" style="color: ${step.color};">${step.key}</span>
+                    <div>
+                        <div class="font-semibold text-slate-800">${step.name}</div>
+                        <div class="text-xs text-slate-500">${step.objective}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function switchMethodologyStep(keyName) {
+            activeStep = keyName;
+            
+            document.querySelectorAll('.step-card').forEach(card => {
+                card.classList.remove('active');
+                card.classList.add('bg-white');
+            });
+
+            const currentStep = methodology.find(s => s.key + s.name === keyName);
+            const activeCard = document.getElementById(`step-${keyName}`);
+            if (activeCard) {
+                activeCard.classList.add('active');
+                activeCard.classList.remove('bg-white');
+            }
+
+            renderMethodologyDetail(currentStep);
+        }
+
+        function renderMethodologyDetail(step) {
+            const container = document.getElementById('methodology-detail');
+            container.classList.remove('fade-in'); 
+            void container.offsetWidth;
+            container.classList.add('fade-in'); 
+
+            container.innerHTML = `
+                <span class="text-5xl font-extrabold block mb-4" style="color: ${step.color};">${step.key}</span>
+                <h3 class="text-2xl font-bold text-slate-900 mb-3">${step.name} Phase</h3>
+                <p class="text-lg text-slate-700 mb-6 border-b pb-4">${step.objective}</p>
+                
+                <!-- KEY ACTIVITIES -->
+                <h4 class="font-semibold text-slate-800 mb-3 flex items-center gap-2">Key Activities</h4>
+                <ul class="space-y-3 mb-6">
+                    ${step.activities.map(activity => `
+                        <li class="flex items-start text-sm text-slate-600">
+                            <span class="text-emerald-500 mr-2 mt-1">✓</span>
+                            ${activity}
+                        </li>
+                    `).join('')}
+                </ul>
+
+                <!-- INTEGRATED TOOLS -->
+                <h4 class="font-semibold text-slate-800 mb-3 flex items-center gap-2 border-t pt-4">Integrated Tools</h4>
+                <ul class="space-y-3">
+                    ${step.tools.map(tool => `
+                        <li class="flex items-start text-sm text-slate-600">
+                            <span class="text-sky-500 mr-2 mt-1">🛠️</span>
+                            ${tool}
+                        </li>
+                    `).join('')}
+                </ul>
+            `;
+        }
+
+        function renderFAQ() {
+            const container = document.getElementById('faq-container');
+            let html = '';
+
+            faqData.forEach((section, sectionIndex) => {
+                html += `<h3 class="text-xl font-semibold text-slate-800 mt-8 mb-4 border-b pb-2 text-sky-600">${section.category}</h3>`;
+                
+                section.questions.forEach((item, itemIndex) => {
+                    const id = `faq-${sectionIndex}-${itemIndex}`;
+                    html += `
+                        <div class="border-b border-slate-200">
+                            <div class="faq-question flex justify-between items-center py-4 px-2 hover:bg-slate-50 rounded-lg" onclick="toggleFAQ('${id}')" id="q-${id}">
+                                <p class="font-medium text-slate-700">${item.q}</p>
+                                <svg class="chevron w-5 h-5 text-sky-500" id="icon-${id}" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
+                            <div class="faq-answer px-2 text-slate-600" id="a-${id}">
+                                <p>${item.a}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+
+            container.innerHTML = html;
+        }
+
+        function toggleFAQ(id) {
+            const answer = document.getElementById(`a-${id}`);
+            const icon = document.getElementById(`icon-${id}`);
+
+            if (answer.classList.contains('open')) {
+                answer.classList.remove('open');
+                icon.classList.remove('rotated');
+            } else {
+                // Close all other open answers (optional, but good for focus)
+                document.querySelectorAll('.faq-answer.open').forEach(openAnswer => {
+                    openAnswer.classList.remove('open');
+                    const openIconId = openAnswer.id.replace('a-', 'icon-');
+                    document.getElementById(openIconId)?.classList.remove('rotated');
+                });
+
+                // Open the current answer
+                answer.classList.add('open');
+                icon.classList.add('rotated');
+            }
+        }
+
+        function initCoverageChart() {
+            const ctx = document.getElementById('coverageChart');
+            if (!ctx) return;
+
+            const data = {
+                labels: ['Risk Mitigation', 'Recovery Planning', 'Plan Testing', 'Business Impact Analysis'],
+                datasets: [{
+                    data: [85, 75, 90, 80],
+                    backgroundColor: [
+                        'rgba(14, 165, 233, 0.7)',  // Sky
+                        'rgba(16, 185, 129, 0.7)',  // Emerald
+                        'rgba(99, 102, 241, 0.7)',  // Indigo
+                        'rgba(245, 158, 11, 0.7)'   // Amber
+                    ],
+                    borderColor: '#ffffff',
+                    borderWidth: 1
+                }]
+            };
+
+            new Chart(ctx.getContext('2d'), {
+                type: 'polarArea',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    family: 'Inter',
+                                    size: 11
+                                }
+                            }
+                        },
+                        title: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        r: {
+                            pointLabels: {
+                                display: true,
+                                centerPointLabels: true,
+                                font: {
+                                    size: 14
+                                }
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 100
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
