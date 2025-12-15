@@ -2,9 +2,6 @@
 
 pscp is a lightweight, cross-platform command-line tool for secure file transfers over SSH (SCP/SFTP). It aims to be fast, simple to use, and suitable for scripting and automation. This README provides installation instructions, usage examples, configuration options, and guidance for contributing.
 
-url=https://github.com/cognitioplus/pscp/blob/1a177a7a67bc66a7bf76117c26ee6d7bad488e0d/README.md
-# pscp
-
 pscp is a lightweight, cross-platform command-line tool for secure file transfers over SSH (SCP/SFTP). It aims to be fast, simple to use, and suitable for scripting and automation. This README provides installation instructions, usage examples, configuration options, and guidance for contributing.
 
 > Note: This README is a general, ready-to-edit template. Adjust the installation and build sections to match the actual languages, prerequisites, and packaging used by this repository.
