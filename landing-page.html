@@ -42,6 +42,8 @@
             color: var(--dark);
             line-height: 1.6;
             overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
         }
         
         h1, h2, h3, h4 {
@@ -92,6 +94,21 @@
             color: white;
         }
         
+        .btn-dashboard {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 0.85rem 1.75rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-dashboard:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px -5px rgba(30, 64, 175, 0.4);
+        }
+        
         .section {
             padding: 5rem 0;
         }
@@ -137,16 +154,18 @@
         }
         
         .logo-icon {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
             width: 40px;
             height: 40px;
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 1.25rem;
+        }
+        
+        .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
         
         .logo-text {
@@ -231,6 +250,7 @@
         .hero-cta {
             display: flex;
             gap: 1rem;
+            flex-wrap: wrap;
         }
         
         .hero-image {
@@ -386,11 +406,25 @@
             color: white;
             text-align: center;
             padding: 5rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -10%;
+            width: 800px;
+            height: 800px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 70%);
         }
         
         .cta h2 {
             font-size: 2.5rem;
             margin-bottom: 1.5rem;
+            position: relative;
         }
         
         .cta p {
@@ -398,11 +432,12 @@
             max-width: 700px;
             margin: 0 auto 2.5rem;
             opacity: 0.9;
+            position: relative;
         }
         
         .cta-form {
             max-width: 600px;
-            margin: 0 auto;
+            margin: 0 auto 3rem;
             display: flex;
             gap: 1rem;
         }
@@ -422,6 +457,7 @@
             flex-wrap: wrap;
             gap: 2rem;
             margin-top: 3rem;
+            position: relative;
         }
         
         .stat-item {
@@ -435,6 +471,42 @@
             background: linear-gradient(to right, #fbbf24, #f59e0b);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+        }
+        
+        /* Floating Action Button */
+        .floating-dashboard {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            background: linear-gradient(135deg, var(--secondary), #eab308);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
+            box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.4);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .floating-dashboard:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 30px -5px rgba(245, 158, 11, 0.5);
+        }
+        
+        .floating-logo {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+        }
+        
+        .floating-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
         
         /* Footer */
@@ -514,6 +586,13 @@
             .compliance-badges {
                 justify-content: center;
             }
+            
+            .floating-dashboard {
+                bottom: 1.5rem;
+                right: 1.5rem;
+                padding: 0.6rem 1.2rem;
+                font-size: 0.9rem;
+            }
         }
         
         @media (max-width: 768px) {
@@ -544,6 +623,11 @@
             .stats {
                 gap: 1rem;
             }
+            
+            .btn-dashboard {
+                padding: 0.7rem 1.5rem;
+                font-size: 1rem;
+            }
         }
         
         @media (max-width: 480px) {
@@ -558,16 +642,36 @@
             .stat-number {
                 font-size: 2.5rem;
             }
+            
+            .floating-dashboard {
+                padding: 0.5rem 1rem;
+                font-size: 0.85rem;
+            }
+            
+            .floating-logo {
+                width: 20px;
+                height: 20px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Floating Dashboard Button -->
+    <a href="https://ddrive-erm.appimize.app/home/" class="floating-dashboard">
+        <div class="floating-logo">
+            <img src="https://ddrive-erm.appimize.app/assets/apps/user_1097/app_12127/draft/icon/app_logo.png?1767510419" alt="DDRiVE-M Logo">
+        </div>
+        LAUNCH DASHBOARD NOW
+    </a>
+
     <!-- Header -->
     <header>
         <div class="container">
             <nav class="navbar">
                 <div class="logo">
-                    <div class="logo-icon">D</div>
+                    <div class="logo-icon">
+                        <img src="https://ddrive-erm.appimize.app/assets/apps/user_1097/app_12127/draft/icon/app_logo.png?1767510419" alt="DDRiVE-M Logo">
+                    </div>
                     <div>
                         <div class="logo-text">DDRiVE-M</div>
                         <div class="logo-subtext">Intelligence Cycle System</div>
@@ -592,7 +696,7 @@
                     <h1>AI-Powered Disaster Resilience for LGUs, SMEs, and Institutions</h1>
                     <p>Comprehensive intelligence platform compliant with RA 10121, ISO 31000, and UNDRR frameworks. Enhance your disaster preparedness from detection to recovery.</p>
                     <div class="hero-cta">
-                        <a href="#contact" class="btn btn-primary">Request Demo</a>
+                        <a href="https://ddrive-erm.appimize.app/home/" class="btn btn-dashboard">OPEN DASHBOARD</a>
                         <a href="#video" class="btn btn-secondary">Watch Video</a>
                     </div>
                     <div class="compliance-badges">
@@ -706,10 +810,7 @@
         <div class="container">
             <h2>Ready to Transform Your LGU's Disaster Resilience?</h2>
             <p>Join hundreds of Philippine LGUs already using DDRiVE-M to protect their communities and comply with national standards.</p>
-            <div class="cta-form">
-                <input type="email" placeholder="Enter your official email" aria-label="Email address">
-                <button class="btn btn-secondary" style="background: white; color: var(--primary);">Get Started</button>
-            </div>
+            <a href="https://ddrive-erm.appimize.app/home/" class="btn btn-dashboard">GET STARTED NOW</a>
             <div class="stats">
                 <div class="stat-item">
                     <div class="stat-number">120+</div>
@@ -738,30 +839,18 @@
                 <div class="footer-col">
                     <h3>Platform</h3>
                     <ul class="footer-links">
-                        <li><a href="#">7-Phase Cycle</a></li>
-                        <li><a href="#">LGU Dashboard</a></li>
-                        <li><a href="#">Hazard Monitoring</a></li>
-                        <li><a href="#">Risk Assessment</a></li>
-                        <li><a href="#">Response Planning</a></li>
+                        <li><a href="https://ddrive-erm.appimize.app/home">Dashboard</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
-                    <h3>Compliance</h3>
                     <ul class="footer-links">
-                        <li><a href="#">RA 10121</a></li>
-                        <li><a href="#">ISO 31000</a></li>
-                        <li><a href="#">UNDRR MCR2030</a></li>
-                        <li><a href="#">DILG Standards</a></li>
-                        <li><a href="#">NDRRMC Framework</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
                     <h3>Contact</h3>
                     <ul class="footer-links">
                         <li><a href="mailto:alvin.silva@cogmnitioplus.com">EMAIL US</a></li>
-                        <li><a href="tel:+639178555134">+63 (917) 8555 134</a></li>
-                        <li>Quezon City, Philippines</li>
-                        <li>Monday-Friday: 8am-5pm</li>
+                        <li><a href="tel:+639178555134">+63 (917) 8555 134</a>CALL US</li>
                     </ul>
                 </div>
             </div>
