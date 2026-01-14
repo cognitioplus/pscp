@@ -25,8 +25,8 @@
         <header class="flex-none p-4 bg-gray-900 border-b border-gray-700 flex items-center shadow-lg">
             <img src="https://ddrive-erm.appimize.app/assets/apps/user_1097/app_12127/draft/icon/app_logo.png?1764820803" alt="DDRiVEr Logo" class="w-10 h-10 rounded-full mr-3 border-2 border-indigo-500">
             <div>
-                <h1 class="text-xl font-bold text-white">DDRiVEr AI Chat</h1>
-                <p class="text-xs text-indigo-400">Expert: DRRM, ISO, COSO, Sendai, Philippine Policy</p>
+                <h1 class="text-xl font-bold text-white">DDRiVER AI Chat</h1>
+                <p class="text-xs text-indigo-400">Expert: DRRM Philippine Policies, ISO, COSO, Sendai, UNDRR-MCR2030</p>
             </div>
         </header>
 
@@ -43,7 +43,7 @@
                 <div class="loading-dot w-2 h-2 bg-indigo-500 rounded-full"></div>
                 <div class="loading-dot w-2 h-2 bg-indigo-500 rounded-full"></div>
                 <div class="loading-dot w-2 h-2 bg-indigo-500 rounded-full"></div>
-                <span class="text-xs text-indigo-400 ml-2">DDRiVEr is typing...</span>
+                <span class="text-xs text-indigo-400 ml-2">DDRiVER is typing...</span>
             </div>
             <div id="scroll-anchor"></div>
         </div>
@@ -63,11 +63,11 @@
     </div>
 
     <script type="module">
-
-
         // --- GLOBAL CONFIGURATION ---
         const LOCAL_STORAGE_KEY = 'ddriverChatHistory';
-        const apiKey = ""; // API key is provided by the canvas environment for the fetch call
+        const apiKey = ""; // Replace with your OpenAI API key or inject via secure method
+        const apiUrl = "https://api.openai.com/v1/chat/completions";
+        const model = "gpt-4o"; // or gpt-4o-mini, gpt-4-turbo, etc.
 
         let isInitialized = false;
 
@@ -79,7 +79,7 @@
         const messageForm = document.getElementById('message-form');
         const userInput = document.getElementById('user-input');
 
-        // --- AI System Instruction (REMAINS THE SAME) ---
+        // --- SYSTEM PROMPT (UNCHANGED) ---
         const systemPrompt = `
             You are DDRiVER AI Chat, an elite, highly specialized expert and consultant focused on integrated Disaster Risk Reduction and Management (DRRM), Climate Change Adaptation, Anticipatory Actions and Public Service Continuity. Your knowledge base is authoritative, integrating key global and Philippine national frameworks.
 
@@ -96,7 +96,6 @@
             * Answer all questions strictly within the boundaries of your defined expertise.
             * Do not use markdown headers (##, ###) in your response body.
         `;
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
 
         // --- LOCAL STORAGE PERSISTENCE FUNCTIONS ---
 
@@ -120,12 +119,10 @@
 
         // --- UTILITY FUNCTIONS ---
 
-        // Scrolls chat to the bottom
         function scrollToBottom() {
             chatHistoryElement.scrollTop = chatHistoryElement.scrollHeight;
         }
 
-        // Enables/disables controls during AI processing
         function setControlsDisabled(disabled) {
             sendButton.disabled = disabled;
             userInput.disabled = disabled;
@@ -136,13 +133,11 @@
             }
         }
 
-        // Renders a message bubble
         function renderMessage(message) {
-            const isAI = message.role === 'model';
+            const isAI = message.role === 'assistant';
             const alignment = isAI ? 'justify-start' : 'justify-end';
             const bubbleClass = isAI ? 'ai-bubble bg-gray-700 text-gray-100' : 'user-bubble bg-indigo-600 text-white';
             
-            // Format timestamp from milliseconds to a readable time string
             const timeString = message.timestamp ? new Date(message.timestamp).toLocaleTimeString() : '';
 
             const messageHtml = `
@@ -156,11 +151,9 @@
             chatHistoryElement.insertAdjacentHTML('beforeend', messageHtml);
         }
 
-        // Handles rendering all messages from the local storage
         function renderChatHistory() {
             const history = getStoredHistory();
             
-            // Clear existing history, but keep the initial greeting element
             let messagesToRemove = Array.from(chatHistoryElement.children).filter(child => child.id !== 'initial-greeting' && child.id !== 'loading-indicator' && child.id !== 'scroll-anchor');
             messagesToRemove.forEach(child => child.remove());
 
@@ -168,63 +161,65 @@
             scrollToBottom();
         }
 
-        // --- GEMINI API INTERACTION (REMAINS THE SAME) ---
+        // --- OPENAI API INTERACTION ---
 
-        // Function to call the Gemini API with exponential backoff
         async function fetchWithRetry(url, options, maxRetries = 5) {
             for (let i = 0; i < maxRetries; i++) {
                 try {
                     const response = await fetch(url, options);
                     if (!response.ok) {
-                        // Throw error to be caught and retried
-                        throw new Error(`HTTP error! status: ${response.status}`);
+                        const errorText = await response.text();
+                        throw new Error(`HTTP ${response.status}: ${errorText}`);
                     }
                     return await response.json();
                 } catch (error) {
                     console.warn(`Attempt ${i + 1} failed: ${error.message}. Retrying...`);
-                    if (i === maxRetries - 1) throw error; // Re-throw if last attempt
-                    const delay = Math.pow(2, i) * 1000 + Math.random() * 1000; // Exponential backoff + jitter
+                    if (i === maxRetries - 1) throw error;
+                    const delay = Math.pow(2, i) * 1000 + Math.random() * 1000;
                     await new Promise(resolve => setTimeout(resolve, delay));
                 }
             }
         }
 
         async function getAIResponse(chatHistory) {
-            const conversation = chatHistory.map(msg => ({
-                role: msg.role,
-                parts: [{ text: msg.text }]
-            }));
-            
-            const payload = {
-                contents: conversation,
-                systemInstruction: {
-                    parts: [{ text: systemPrompt }]
-                }
-            };
+            // OpenAI requires messages in format: [{ role: "system" | "user" | "assistant", content: "..." }]
+            const messages = [
+                { role: "system", content: systemPrompt.trim() },
+                ...chatHistory.map(msg => ({
+                    role: msg.role === 'model' ? 'assistant' : 'user',
+                    content: msg.text
+                }))
+            ];
 
             try {
                 const result = await fetchWithRetry(apiUrl, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: model,
+                        messages: messages,
+                        temperature: 0.3,
+                        max_tokens: 1000
+                    })
                 });
 
-                const text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+                const text = result?.choices?.[0]?.message?.content;
                 if (!text) {
                     throw new Error("AI response was empty or malformed.");
                 }
-                return text;
+                return text.trim();
             } catch (error) {
-                console.error("Gemini API call failed:", error);
+                console.error("OpenAI API call failed:", error);
                 return "I'm sorry, I'm currently unable to access my expert knowledge. Please try again later.";
             }
         }
 
         // --- CHAT LOGIC ---
 
-        // Fetch current chat history to seed the AI model
         function getCurrentChatHistory() {
-            // Returns the currently stored array of messages
             return getStoredHistory();
         }
 
@@ -239,11 +234,11 @@
             if (!userText) return;
 
             setControlsDisabled(true);
-            userInput.value = ''; // Clear input immediately
+            userInput.value = '';
 
             let history = getCurrentChatHistory();
 
-            // 1. Save User Message to Local Storage
+            // Save user message
             const userMessage = {
                 role: 'user',
                 text: userText,
@@ -251,22 +246,21 @@
             };
             history.push(userMessage);
             saveStoredHistory(history);
-            renderChatHistory(); // Update UI immediately
+            renderChatHistory();
 
-            // 2. Call AI
-            // Note: history already contains the latest user message
+            // Get AI response
             const aiResponseText = await getAIResponse(history);
 
-            // 3. Save AI Response to Local Storage
+            // Save AI message
             const aiMessage = {
-                role: 'model',
+                role: 'assistant',
                 text: aiResponseText,
                 timestamp: Date.now()
             };
             history.push(aiMessage);
             saveStoredHistory(history);
-            renderChatHistory(); // Update UI with AI message
-            
+            renderChatHistory();
+
             setControlsDisabled(false);
             userInput.focus();
         }
@@ -274,15 +268,13 @@
         // --- STARTUP ---
 
         function initChat() {
-            // Load and render history on startup
             renderChatHistory();
             isInitialized = true;
             authStatusElement.textContent = `Using Local Storage for chat history.`;
         }
-        
+
         initChat();
         messageForm.addEventListener('submit', handleSendMessage);
-        
     </script>
 </body>
 </html>
