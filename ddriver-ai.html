@@ -35,7 +35,7 @@
             <!-- Initial Greeting Message -->
             <div id="initial-greeting" class="flex mb-4">
                 <div class="message-bubble ai-bubble">
-                    Hello! I am DDRiVEr, your expert AI consultant on ISO Frameworks, COSO ERM, the Sendai Framework, and Philippine DRRM policies including anticipatory actions and resilience scoring. How can I assist with your planning or knowledge needs today?
+                    Hello! I am your DDRiVER, your AI support and guide to navigate risks, vulnerabilities, and resilience guided with ISO Frameworks, COSO ERM, the Sendai Framework, and Philippine DRRM policies including anticipatory actions. How can I assist with your planning or knowledge needs today?
                 </div>
             </div>
             <!-- Messages will be injected here -->
@@ -51,7 +51,7 @@
         <!-- Message Input -->
         <div class="flex-none p-4 bg-gray-900 border-t border-gray-700">
             <form id="message-form" class="flex space-x-3">
-                <input type="text" id="user-input" placeholder="Ask about ISO, Sendai, or DRRM policy..." required 
+                <input type="text" id="user-input" placeholder="Ask about integrated risk management, Sendai, systemic risk navigation and resilience." required 
                        class="flex-grow p-3 rounded-xl bg-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:outline-none border border-gray-600">
                 <button type="submit" id="send-button"
                         class="px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition duration-150 disabled:bg-indigo-400 disabled:cursor-not-allowed shadow-md shadow-indigo-600/30">
@@ -81,13 +81,13 @@
 
         // --- AI System Instruction (REMAINS THE SAME) ---
         const systemPrompt = `
-            You are DDRiVEr AI Chat, an elite, highly specialized expert and consultant focused on Disaster Risk Reduction and Management (DRRM), Climate Change Adaptation, and Public Service Continuity. Your knowledge base is authoritative, integrating key global and Philippine national frameworks.
+            You are DDRiVER AI Chat, an elite, highly specialized expert and consultant focused on integrated Disaster Risk Reduction and Management (DRRM), Climate Change Adaptation, Anticipatory Actions and Public Service Continuity. Your knowledge base is authoritative, integrating key global and Philippine national frameworks.
 
             Your Expertise Areas Include:
-            1. Global Frameworks: ISO Frameworks (e.g., ISO 22301 for Business Continuity), COSO Framework (Enterprise Risk Management - ERM), and the Sendai Framework for Disaster Risk Reduction (2015-2030).
+            1. Global Frameworks: ISO Frameworks (e.g., ISO 31000 for Enterprise Risk Management), COSO Risk Framework (Enterprise Risk Management - ERM), and the Sendai Framework for Disaster Risk Reduction (2015-2030).
             2. Philippine Policies (DRRM & Climate Change): Comprehensive knowledge of relevant Philippine laws, policies, and implementing rules, including specific details on DRRM cycles (reduction, preparedness, response, recovery), and climate change actions.
             3. Anticipatory Actions & Continuity Planning: Expertise in pre-disaster actions, climate change adaptation strategies, and Public Service Continuity Plans (PSCP).
-            4. Urban Resilience: Mastery of the MCR 2030 (Making Cities Resilient 2030) initiative, including the 10 Essentials of City Resilience and the Resilience Score Card.
+            4. Urban and Community Resilience: Mastery of the MCR 2030 (Making Cities and Communities Resilient 2030) initiative, including the 10 Essentials of City or Community Resilience and the Resilience Score Card.
 
             Your Role & Tone:
             * Provide clear, structured, and actionable advice.
